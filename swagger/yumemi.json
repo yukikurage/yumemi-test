@@ -1,0 +1,198 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ゆめみフロントエンドコーディング試験 API",
+    "description": "## API 概要\n\nゆめみフロントエンドコーディング試験用の API です。",
+    "license": {
+      "name": "MIT License",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://yumemi-frontend-engineer-codecheck-api.vercel.app"
+    }
+  ],
+  "security": [
+    {
+      "apiKey": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
+      }
+    },
+    "schemas": {
+      "Prefecture": {
+        "type": "object",
+        "properties": {
+          "prefCode": {
+            "type": "integer",
+            "description": "都道府県コード",
+            "example": 1
+          },
+          "prefName": {
+            "type": "string",
+            "description": "都道府県名",
+            "example": "北海道"
+          }
+        },
+        "required": [
+          "prefCode",
+          "prefName"
+        ]
+      },
+      "PrefecturesResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "nullable": true
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Prefecture"
+            }
+          }
+        },
+        "required": [
+          "message",
+          "result"
+        ]
+      },
+      "PopulationCompositionPerYear": {
+        "type": "object",
+        "properties": {
+          "boundaryYear": {
+            "type": "integer",
+            "description": "実績値と推計値の区切り年",
+            "example": 2020
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "description": "ラベル",
+                  "example": "年少人口"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "year": {
+                        "type": "integer",
+                        "description": "年",
+                        "example": 1960
+                      },
+                      "value": {
+                        "type": "integer",
+                        "description": "人口",
+                        "example": 1681479
+                      },
+                      "rate": {
+                        "type": "number",
+                        "description": "割合（label が総人口の場合は存在しません）",
+                        "example": 33.37
+                      }
+                    },
+                    "required": [
+                      "year",
+                      "value"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "label",
+                "data"
+              ]
+            }
+          }
+        },
+        "required": [
+          "boundaryYear",
+          "data"
+        ]
+      },
+      "PopulationCompositionPerYearResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "nullable": true
+          },
+          "result": {
+            "$ref": "#/components/schemas/PopulationCompositionPerYear"
+          }
+        },
+        "required": [
+          "message",
+          "result"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/api/v1/prefectures": {
+      "get": {
+        "description": "都道府県に関する一覧データを返します。",
+        "tags": [
+          "都道府県一覧"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrefecturesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/population/composition/perYear": {
+      "get": {
+        "description": "地域単位、年単位の年齢構成のデータを返します。",
+        "tags": [
+          "人口構成"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "都道府県コード",
+              "example": "1"
+            },
+            "required": true,
+            "name": "prefCode",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PopulationCompositionPerYearResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
