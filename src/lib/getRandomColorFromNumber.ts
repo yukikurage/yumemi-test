@@ -18,8 +18,8 @@ export function getRandomColorFromNumber(
   // 背景色に応じて明度を調整
   const lightness =
     backgroundColor === "light"
-      ? 40 + (hash % 20) // 暗めの色 (40-60%)
-      : 60 + (hash % 20); // 明るめの色 (60-80%)
+      ? 40 + (hash % 10) // 暗めの色 (40-60%)
+      : 60 + (hash % 10); // 明るめの色 (60-80%)
 
   const saturation = 70 + (hash % 20); // 70-90%
 

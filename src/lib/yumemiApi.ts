@@ -1,5 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { client } from "./api-client";
+import { client } from "./apiClient";
 
 /**
  * 都道府県一覧を取得
@@ -14,13 +13,7 @@ import { client } from "./api-client";
  * ```
  */
 export async function getPrefectures() {
-  const { env } = getCloudflareContext();
-
-  const { data, error } = await client.GET("/api/v1/prefectures", {
-    headers: {
-      "X-API-KEY": env.YUMEMI_API_KEY,
-    },
-  });
+  const { data, error } = await client.GET("/api/v1/prefectures");
 
   if (error) {
     throw new Error(`Failed to fetch prefectures: ${JSON.stringify(error)}`);
@@ -44,8 +37,6 @@ export async function getPrefectures() {
  * ```
  */
 export async function getPopulationComposition(prefCode: number) {
-  const { env } = getCloudflareContext();
-
   const { data, error } = await client.GET(
     "/api/v1/population/composition/perYear",
     {
@@ -53,9 +44,6 @@ export async function getPopulationComposition(prefCode: number) {
         query: {
           prefCode: String(prefCode),
         },
-      },
-      headers: {
-        "X-API-KEY": env.YUMEMI_API_KEY,
       },
     }
   );

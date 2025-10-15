@@ -1,0 +1,13 @@
+@keyframes anim-loading-keyframes {
+  from {
+    background-position-x: 0%;
+  }
+  to {
+    background-position-x: -200%;
+  }
+}
+
+.anim-loading {
+  animation: anim-loading-keyframes 1.5s linear infinite;
+  background-size: 200% 100%;
+}
