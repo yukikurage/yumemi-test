@@ -139,7 +139,9 @@ export const PopulationChart = memo(function PopulationChart({
   return (
     <div className="flex flex-col h-fit gap-4">
       {/* 選択中の県のチップ表示 */}
-      <div className="flex flex-wrap gap-2">
+      <div
+        className={`flex gap-2 ${compact ? "overflow-x-auto" : "flex-wrap"}`}
+      >
         {selectedPrefectures.map((pref) => (
           <PrefectureChip
             key={pref.prefCode}

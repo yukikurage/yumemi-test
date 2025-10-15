@@ -9,7 +9,7 @@ type PrefectureChipProps = {
 
 export function PrefectureChip({ prefecture, onRemove }: PrefectureChipProps) {
   return (
-    <div className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full">
+    <div className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full shrink-0">
       <span className="text-sm font-medium">{prefecture.prefName}</span>
       <button
         onClick={onRemove}
