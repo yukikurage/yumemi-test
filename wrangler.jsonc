@@ -13,8 +13,17 @@
 	],
 	"assets": {
 		"binding": "ASSETS",
-		"directory": ".open-next/assets"
+		"directory": ".open-next/assets",
 	},
+	"rules": [
+		{
+			"type": "ESModule",
+			"globs": [
+				"**/*.js"
+			],
+			"fallthrough": true
+		}
+	],
 	"observability": {
 		"logs": {
 			"enabled": true,
