@@ -57,9 +57,7 @@ export const PrefectureSelection = memo(function PrefectureSelection({
       compositionMap.set(data.prefCode, { youth, workingAge, elderly });
 
       // 総人口
-      const totalData = data.totalPopulation.find(
-        (d) => d.year === targetYear
-      );
+      const totalData = data.totalPopulation.find((d) => d.year === targetYear);
       totalMap.set(data.prefCode, totalData?.value || 0);
     });
 
@@ -70,7 +68,7 @@ export const PrefectureSelection = memo(function PrefectureSelection({
   }, [allPopulationData]);
 
   return (
-    <div className="w-fit h-20 md:h-36 overflow-visible flex items-end gap-2 md:gap-4 flex-nowrap">
+    <div className="w-fit h-20 lg:h-36 overflow-visible flex items-end gap-2 lg:gap-4 flex-nowrap">
       {prefectures.map((pref) => {
         return (
           <PrefectureCard

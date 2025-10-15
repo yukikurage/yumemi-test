@@ -17,13 +17,13 @@ export function AgeGroupSelector({
   onChange,
 }: AgeGroupSelectorProps) {
   return (
-    <div className="w-full md:w-96 inline-flex bg-gray-100 rounded-lg p-1">
+    <div className="w-full lg:w-96 inline-flex bg-gray-100 rounded-lg p-1">
       {AGE_GROUPS.map((group) => (
         <button
           key={group.value}
           onClick={() => onChange(group.value)}
           className={`
-            py-1 md:py-2 text-sm font-medium transition-all rounded-md cursor-pointer grow
+            py-1 lg:py-2 text-sm font-medium transition-all rounded-md cursor-pointer grow
             ${
               selected === group.value
                 ? "bg-white text-gray-900 shadow-sm"

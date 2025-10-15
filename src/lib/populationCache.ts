@@ -7,7 +7,7 @@ type PopulationCompositionPerYearResponse =
 export async function getCachedPopulationData(
   prefCode: number
 ): Promise<PopulationCompositionPerYearResponse> {
-  const { env } = getCloudflareContext();
+  const { env } = await getCloudflareContext({ async: true });
   const cacheKey = `population:${prefCode}`;
 
   // KVから取得（Cron Workerが事前にキャッシュ済み）
@@ -43,7 +43,7 @@ export async function getCachedPopulationData(
  * KV の list() を使って population:* で始まる全てのキーを取得
  */
 export async function getAllCachedPopulationData() {
-  const { env } = getCloudflareContext();
+  const { env } = await getCloudflareContext({ async: true });
 
   // prefix "population:" で始まる全てのキーをリスト
   const list = await env.POPULATION_CACHE.list({ prefix: "population:" });

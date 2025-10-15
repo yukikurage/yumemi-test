@@ -77,7 +77,7 @@ export const PopulationChart = memo(function PopulationChart({
     return Math.min(...populationDataValues.map((data) => data.boundaryYear));
   }, [populationDataValues]);
 
-  // グラフ用のデータを整形（最適化版）
+  // グラフ用のデータを整形
   const chartData = useMemo(() => {
     // 各都道府県のデータを事前に変換（年→値のマップを作成）
     const prefDataMaps = populationDataValues.map((prefData) => {

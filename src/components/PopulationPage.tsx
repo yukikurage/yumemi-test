@@ -2,14 +2,12 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import type { components } from "@/generated/api";
-import { PrefectureSelection } from "./PrefectureSelection";
-import { PopulationChart } from "./PopulationChart";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { searchPrefectures } from "@/lib/searchPrefectures";
-import { SearchInput } from "./SearchInput";
 import { JapanMap } from "./JapanMap";
-import { PieChartLegend } from "./PieChartLegend";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
+import { DesktopGraphPanel } from "./DesktopGraphPanel";
+import { MobileGraphPanel } from "./MobileGraphPanel";
+import { PrefectureSelectionPanel } from "./PrefectureSelectionPanel";
 
 type Prefecture = components["schemas"]["Prefecture"];
 
@@ -117,10 +115,10 @@ export function PopulationPage({
   return (
     <div className="relative h-full flex flex-row gap-10 w-full">
       {/* グリッド背景（ページ全体） */}
-      <div className="absolute inset-0 pointer-events-none -z-10 bg-grid" />
+      <div className="fixed inset-0 pointer-events-none -z-10 bg-grid" />
 
       {/* 日本地図エリア（ページ全体） */}
-      <div className="absolute inset-0">
+      <div className="fixed inset-0">
         <JapanMap
           prefectures={prefectures}
           selectedPrefCodes={selectedPrefs}
@@ -130,119 +128,51 @@ export function PopulationPage({
       </div>
 
       {/* グラフエリア（デスクトップ） */}
-      <div
-        className="hidden md:block absolute right-4 top-4 rounded-md bg-white/90 backdrop-blur-sm p-8 border border-neutral-200 max-w-2xl transition-opacity duration-500 overflow-auto"
-        style={{
-          opacity: hasSelection ? 1 : 0,
-          pointerEvents: hasSelection ? "auto" : "none",
-          maxHeight: "calc(100vh - 280px)",
-        }}
-      >
-        <PopulationChart
-          prefectures={prefectures}
-          populationData={selectedPopulationData}
-          onRemovePrefecture={handleRemovePrefecture}
-        />
-      </div>
+      <DesktopGraphPanel
+        hasSelection={hasSelection}
+        prefectures={prefectures}
+        populationData={selectedPopulationData}
+        onRemovePrefecture={handleRemovePrefecture}
+      />
 
-      {/* グラフエリア（モバイル*/}
-      {(mobileGraphState === "compact" || mobileGraphState === "expanded") && (
-        <div
-          className="md:hidden fixed left-0 right-0 bg-white border-t border-neutral-200 shadow-lg z-10 overflow-auto transition-all duration-300 rounded-t-4xl"
-          style={{
-            bottom: 0,
-            top:
-              mobileGraphState === "expanded"
-                ? "calc(64px + 200px)"
-                : "calc(100dvh - 280px)",
-          }}
-        >
-          <div className="flex items-center justify-center sticky top-0 z-10 w-full">
-            {/* 開く / 閉じるボタン */}
-            <button
-              onClick={() => {
-                if (mobileGraphState === "compact") {
-                  setMobileGraphState("expanded");
-                } else if (mobileGraphState === "expanded") {
-                  setMobileGraphState("hidden");
-                }
-              }}
-              className="w-full py-3 border-b border-neutral-100 bg-white/90 backdrop-blur-sm text-xs text-neutral-500 flex justify-center items-center"
-              aria-label={
-                mobileGraphState === "compact" ? "詳細を展開" : "詳細を閉じる"
-              }
-            >
-              {"compact" === mobileGraphState ? (
-                <ChevronUpIcon className="w-5 h-5" />
-              ) : (
-                <ChevronDownIcon className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+      {/* グラフエリア（モバイル） */}
+      <MobileGraphPanel
+        mobileGraphState={mobileGraphState}
+        setMobileGraphState={setMobileGraphState}
+        prefectures={prefectures}
+        populationData={selectedPopulationData}
+        onRemovePrefecture={handleRemovePrefecture}
+      />
 
-          {/* グラフエリア */}
-          <div className="relative p-4">
-            <PopulationChart
-              prefectures={prefectures}
-              populationData={selectedPopulationData}
-              onRemovePrefecture={handleRemovePrefecture}
-              compact={mobileGraphState === "compact"}
-            />
-          </div>
-        </div>
-      )}
+      {/* 下部：検索バーと都道府県選択（デスクトップ） */}
+      <PrefectureSelectionPanel
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filteredPrefectures={filteredPrefectures}
+        allPopulationData={allPopulationData}
+        onChange={handleChangeSelections}
+        selectedPrefs={selectedPrefs}
+        scrollRef={scrollRef}
+      />
 
-      {/* 下部：検索バーと都道府県選択 */}
-      {/* デスクトップ版 */}
-      <div className="hidden md:flex fixed left-0 right-0 bottom-0 h-fit flex-col gap-4 items-start justify-end">
-        <div className="w-full px-8 pt-4 h-fit flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4">
-          <div className="min-w-full md:min-w-fit md:flex-none">
-            <SearchInput value={searchQuery} onChange={setSearchQuery} />
-          </div>
-          <div className="flex justify-start md:flex-none">
-            <PieChartLegend />
-          </div>
-        </div>
-        <div className="w-full h-fit overflow-auto" ref={scrollRef}>
-          <div className="px-8 pb-8 h-fit w-fit">
-            <PrefectureSelection
-              prefectures={filteredPrefectures}
-              allPopulationData={allPopulationData}
-              onChange={handleChangeSelections}
-              selectedPrefs={selectedPrefs}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* モバイル版 */}
-      <div
-        className="md:hidden fixed left-0 right-0 h-fit flex flex-col gap-3 items-start justify-end transition-all duration-300"
-        style={{
-          bottom:
-            mobileGraphState === "compact"
-              ? "280px"
-              : mobileGraphState === "expanded"
+      {/* 下部：検索バーと都道府県選択（モバイル） */}
+      <PrefectureSelectionPanel
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filteredPrefectures={filteredPrefectures}
+        allPopulationData={allPopulationData}
+        onChange={handleChangeSelections}
+        selectedPrefs={selectedPrefs}
+        isMobile
+        mobileBottom={
+          mobileGraphState === "compact"
+            ? "280px"
+            : mobileGraphState === "expanded"
               ? "auto"
-              : "0",
-          top: mobileGraphState === "expanded" ? "64px" : "auto",
-        }}
-      >
-        <div className="w-full px-4 pt-4 h-fit flex flex-col items-stretch gap-3">
-          <SearchInput value={searchQuery} onChange={setSearchQuery} />
-          <PieChartLegend />
-        </div>
-        <div className="w-full h-fit overflow-auto">
-          <div className="px-4 pb-4 h-fit w-fit">
-            <PrefectureSelection
-              prefectures={filteredPrefectures}
-              allPopulationData={allPopulationData}
-              onChange={handleChangeSelections}
-              selectedPrefs={selectedPrefs}
-            />
-          </div>
-        </div>
-      </div>
+              : "0"
+        }
+        mobileTop={mobileGraphState === "expanded" ? "64px" : "auto"}
+      />
     </div>
   );
 }
