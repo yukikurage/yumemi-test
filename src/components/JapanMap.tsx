@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback, memo } from "react";
 import { geoMercator, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology, GeometryCollection } from "topojson-specification";
@@ -36,7 +36,7 @@ type PrefectureFeature = Feature<Geometry, PrefectureProperties>;
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 8;
 
-export function JapanMap({
+export const JapanMap = memo(function JapanMap({
   prefectures,
   selectedPrefCodes,
   onPrefectureClick,
@@ -172,14 +172,16 @@ export function JapanMap({
     return map;
   }, [prefectures]);
 
-  // 人口データから色を計算
+  // 人口データから色を計算（boundaryYearの値を使用）
   const populationColorMap = useMemo(() => {
     const map = new Map<number, string>();
 
-    // 最新の人口データを取得
+    // boundaryYearの人口データを取得
     const populations = allPopulationData.map((data) => {
-      const latestData = data.totalPopulation[data.totalPopulation.length - 1];
-      return { prefCode: data.prefCode, population: latestData?.value || 0 };
+      const targetData = data.totalPopulation.find(
+        (d) => d.year === data.boundaryYear
+      );
+      return { prefCode: data.prefCode, population: targetData?.value || 0 };
     });
 
     // 最大・最小人口を取得
@@ -626,4 +628,4 @@ export function JapanMap({
       </div>
     </div>
   );
-}
+});

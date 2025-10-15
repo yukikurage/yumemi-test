@@ -14,7 +14,6 @@ export async function getCachedPopulationData(
   const cached = await env.POPULATION_CACHE.get(cacheKey, "json");
 
   if (cached) {
-    console.log(`Cache hit for prefCode ${prefCode}`);
     return cached as PopulationCompositionPerYearResponse;
   }
 
@@ -22,8 +21,6 @@ export async function getCachedPopulationData(
   // - 新規デプロイ直後
   // - KVの有効期限切れ
   // - Cron Worker のエラー
-  console.warn(`Cache miss for prefCode ${prefCode}, fetching from API...`);
-
   const { getPopulationComposition } = await import("./yumemiApi");
   const data = await getPopulationComposition(prefCode);
 
@@ -50,14 +47,10 @@ export async function getAllCachedPopulationData() {
 
   // prefix "population:" で始まる全てのキーをリスト
   const list = await env.POPULATION_CACHE.list({ prefix: "population:" });
-  console.log(`KV list found ${list.keys.length} keys`);
 
   // 各キーの値を並列で取得
   const promises = list.keys.map(({ name }) =>
     env.POPULATION_CACHE.get(name, "json").then((data) => {
-      if (!data) {
-        console.warn(`No data for ${name}`);
-      }
       return {
         // "population:1" -> 1 に変換
         prefCode: parseInt(name.split(":")[1]),
@@ -74,10 +67,6 @@ export async function getAllCachedPopulationData() {
       prefCode: number;
       data: PopulationCompositionPerYearResponse;
     } => r.data !== null
-  );
-
-  console.log(
-    `getAllCachedPopulationData: Retrieved ${filteredResults.length} out of ${results.length} prefectures`
   );
 
   // Map形式で返す

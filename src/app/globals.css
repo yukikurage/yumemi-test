@@ -40,3 +40,10 @@ body {
   background: url(https://grainy-gradients.vercel.app/noise.svg) repeat;
   filter: grayscale(0.5);
 }
+
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, #f1f1f1 1px, transparent 1px),
+    linear-gradient(to top, #f1f1f1 1px, transparent 1px);
+  background-size: 50px 50px;
+}

@@ -10,12 +10,12 @@ export default async function Home() {
     <div className="relative h-screen font-sans flex flex-col">
       <div className="absolute inset-0 bg-noise opacity-20 -z-10" />
       <Header />
-      <div className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden">
         <PopulationPage
           prefectures={prefectures}
           allPopulationData={allPopulationData}
         />
-      </div>
+      </main>
     </div>
   );
 }

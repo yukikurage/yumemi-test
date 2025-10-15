@@ -10,7 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo, useState, useCallback } from "react";
 import type { components } from "@/generated/api";
 import { getRandomColorFromNumber } from "@/lib/getRandomColorFromNumber";
 import { PrefectureChip } from "./PrefectureChip";
@@ -45,43 +45,82 @@ export const PopulationChart = memo(function PopulationChart({
       .filter((p): p is Prefecture => p !== undefined);
   }, [populationData, prefectures]);
 
-  // 年齢層に応じたデータを取得
-  const getDataByAgeGroup = (data: AllPopulationData) => {
-    switch (selectedAgeGroup) {
-      case "youth":
-        return data.youthPopulation;
-      case "working":
-        return data.workingAgePopulation;
-      case "elderly":
-        return data.elderlyPopulation;
-      default:
-        return data.totalPopulation;
-    }
-  };
+  // 都道府県コード→都道府県名のマップ（レンダリング最適化用）
+  const prefCodeToNameMap = useMemo(() => {
+    const map = new Map<number, string>();
+    prefectures.forEach((pref) => {
+      map.set(pref.prefCode, pref.prefName);
+    });
+    return map;
+  }, [prefectures]);
 
-  // グラフ用のデータを整形
-  const chartData: Record<string | number, number>[] = useMemo(() => {
+  // 年齢層に応じたデータを取得
+  const getDataByAgeGroup = useCallback(
+    (data: AllPopulationData) => {
+      switch (selectedAgeGroup) {
+        case "youth":
+          return data.youthPopulation;
+        case "working":
+          return data.workingAgePopulation;
+        case "elderly":
+          return data.elderlyPopulation;
+        default:
+          return data.totalPopulation;
+      }
+    },
+    [selectedAgeGroup]
+  );
+
+  // boundaryYearを取得（最小値を使用）
+  const boundaryYear = useMemo(() => {
+    if (populationDataValues.length === 0) return null;
+    return Math.min(...populationDataValues.map((data) => data.boundaryYear));
+  }, [populationDataValues]);
+
+  // グラフ用のデータを整形（最適化版）
+  const chartData = useMemo(() => {
+    // 各都道府県のデータを事前に変換（年→値のマップを作成）
+    const prefDataMaps = populationDataValues.map((prefData) => {
+      const ageData = getDataByAgeGroup(prefData);
+      const yearMap = new Map<number, number>();
+      ageData.forEach((d) => {
+        yearMap.set(d.year, d.value);
+      });
+      return {
+        prefCode: prefData.prefCode.toString(),
+        yearMap,
+      };
+    });
+
+    // すべての年を収集
     const yearSet = new Set<number>();
-    populationDataValues.forEach((data) => {
-      getDataByAgeGroup(data).forEach((d) => yearSet.add(d.year));
+    prefDataMaps.forEach(({ yearMap }) => {
+      yearMap.forEach((_, year) => yearSet.add(year));
     });
 
     const years = Array.from(yearSet).sort((a, b) => a - b);
+
+    // 各年のデータポイントを作成
     return years.map((year) => {
-      return Object.fromEntries(
-        populationDataValues
-          .map((prefData) => {
-            const ageData = getDataByAgeGroup(prefData);
-            const yearData = ageData.find((d) => d.year === year);
-            return [
-              prefData.prefCode.toString(),
-              yearData ? yearData.value : 0,
-            ];
-          })
-          .concat([["year", year]])
-      );
+      const dataPoint: Record<string, number> = { year };
+
+      prefDataMaps.forEach(({ prefCode, yearMap }) => {
+        const value = yearMap.get(year);
+        if (value !== undefined) {
+          if (year === boundaryYear) {
+            dataPoint[`${prefCode}_before`] = value;
+            dataPoint[`${prefCode}_after`] = value;
+          } else if (!boundaryYear || year < boundaryYear) {
+            dataPoint[`${prefCode}_before`] = value;
+          } else {
+            dataPoint[`${prefCode}_after`] = value;
+          }
+        }
+      });
+
+      return dataPoint;
     });
-  }, [populationDataValues, selectedAgeGroup]);
+  }, [populationDataValues, getDataByAgeGroup, boundaryYear]);
 
   // 統計情報の計算
   const stats = useMemo(() => {
@@ -95,7 +134,7 @@ export const PopulationChart = memo(function PopulationChart({
       selectedCount: populationDataValues.length,
       totalPopulation,
     };
-  }, [populationDataValues, selectedAgeGroup]);
+  }, [getDataByAgeGroup, populationDataValues]);
 
   return (
     <div className="flex flex-col h-fit gap-4">
@@ -147,21 +186,41 @@ export const PopulationChart = memo(function PopulationChart({
             />
             <Tooltip />
             <Legend />
-            {populationDataValues.map((data, i) => {
-              return (
+            {populationDataValues.flatMap((data, i) => {
+              const prefName = prefCodeToNameMap.get(data.prefCode);
+              const color = getRandomColorFromNumber(i);
+              const prefCode = data.prefCode.toString();
+
+              return [
+                // boundary year以前の実線
                 <Line
-                  key={data.prefCode}
+                  isAnimationActive={false}
+                  key={`${prefCode}_before`}
                   type="linear"
-                  dataKey={data.prefCode.toString()}
-                  stroke={getRandomColorFromNumber(i)}
+                  dataKey={`${prefCode}_before`}
+                  stroke={color}
                   strokeWidth={2}
-                  dot={true}
-                  name={
-                    prefectures.find((p) => p.prefCode === data.prefCode)
-                      ?.prefName
-                  }
-                />
-              );
+                  dot={false}
+                  connectNulls={false}
+                  name={prefName}
+                  legendType="line"
+                />,
+                // boundary year以降の点線
+                <Line
+                  isAnimationActive={false}
+                  key={`${prefCode}_after`}
+                  type="linear"
+                  dataKey={`${prefCode}_after`}
+                  stroke={color}
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  dot={false}
+                  connectNulls={false}
+                  name={prefName}
+                  legendType="none"
+                  hide={false}
+                />,
+              ];
             })}
           </LineChart>
         </ResponsiveContainer>

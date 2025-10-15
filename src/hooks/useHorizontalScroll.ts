@@ -18,8 +18,6 @@ export function useHorizontalScroll<T extends HTMLElement>() {
 
     // スムーススクロールアニメーション
     const smoothScroll = () => {
-      console.log("smoothScroll");
-
       if (!element) return;
 
       const currentScroll = element.scrollLeft;

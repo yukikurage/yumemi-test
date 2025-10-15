@@ -43,6 +43,11 @@ export function PopulationPage({
     return new Map(allPopulationData.map((data) => [data.prefCode, data]));
   }, [allPopulationData]);
 
+  // prefCode → Prefecture のマップ（検索の最適化）
+  const prefCodeMap = useMemo(() => {
+    return new Map(prefectures.map((pref) => [pref.prefCode, pref]));
+  }, [prefectures]);
+
   const handleChangeSelections = useCallback(
     (pref: Prefecture, selected: boolean) => {
       if (selected) {
@@ -100,28 +105,19 @@ export function PopulationPage({
 
   const handleMapClick = useCallback(
     (prefCode: number) => {
-      const pref = prefectures.find((p) => p.prefCode === prefCode);
+      const pref = prefCodeMap.get(prefCode);
       if (pref) {
         const isSelected = selectedPrefs.has(prefCode);
         handleChangeSelections(pref, !isSelected);
       }
     },
-    [prefectures, selectedPrefs, handleChangeSelections]
+    [prefCodeMap, selectedPrefs, handleChangeSelections]
   );
 
   return (
     <div className="relative h-full flex flex-row gap-10 w-full">
       {/* グリッド背景（ページ全体） */}
-      <div
-        className="absolute inset-0 pointer-events-none -z-10"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, #f1f1f1 1px, transparent 1px),
-            linear-gradient(to top, #f1f1f1 1px, transparent 1px)
-          `,
-          backgroundSize: "50px 50px",
-        }}
-      />
+      <div className="absolute inset-0 pointer-events-none -z-10 bg-grid" />
 
       {/* 日本地図エリア（ページ全体） */}
       <div className="absolute inset-0">
@@ -158,7 +154,7 @@ export function PopulationPage({
             top:
               mobileGraphState === "expanded"
                 ? "calc(64px + 200px)"
-                : "calc(100vh - 280px)",
+                : "calc(100dvh - 280px)",
           }}
         >
           <div className="flex items-center justify-center sticky top-0 z-10 w-full">
@@ -237,7 +233,7 @@ export function PopulationPage({
           <PieChartLegend />
         </div>
         <div className="w-full h-fit overflow-auto">
-          <div className="px-8 pb-4 h-fit w-fit">
+          <div className="px-4 pb-4 h-fit w-fit">
             <PrefectureSelection
               prefectures={filteredPrefectures}
               allPopulationData={allPopulationData}

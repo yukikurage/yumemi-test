@@ -3,11 +3,11 @@
 import { components } from "@/generated/api";
 import { PrefectureCard } from "./PrefectureCard";
 import type { AllPopulationData } from "./PopulationPage";
-import { useCallback, useMemo } from "react";
+import { useMemo, memo, useCallback } from "react";
 
 type Prefecture = components["schemas"]["Prefecture"];
 
-export function PrefectureSelection({
+export const PrefectureSelection = memo(function PrefectureSelection({
   prefectures,
   allPopulationData,
   onChange,
@@ -18,56 +18,55 @@ export function PrefectureSelection({
   onChange: (pref: Prefecture, selected: boolean) => void;
   selectedPrefs?: Set<number>;
 }) {
-  const handleCheckboxChange = (prefCode: number, checked: boolean) => {
-    const pref = prefectures.find((p) => p.prefCode === prefCode);
-    if (pref) {
-      onChange(pref, checked);
-    }
-  };
+  // prefCode → Prefecture のマップ（検索最適化）
+  const prefCodeMap = useMemo(() => {
+    return new Map(prefectures.map((pref) => [pref.prefCode, pref]));
+  }, [prefectures]);
 
-  // 人口データから最新年の構成データを取得
-  const getPopulationComposition = useCallback(
-    (prefCode: number) => {
-      const data = allPopulationData.find((d) => d.prefCode === prefCode);
-      if (!data) return undefined;
-
-      // 最新年（2020年）のデータを取得
-      const latestYear = 2000;
-      const youth =
-        data.youthPopulation.find((d) => d.year === latestYear)?.value ?? 0;
-      const workingAge =
-        data.workingAgePopulation.find((d) => d.year === latestYear)?.value ??
-        0;
-      const elderly =
-        data.elderlyPopulation.find((d) => d.year === latestYear)?.value ?? 0;
-
-      return { youth, workingAge, elderly };
+  const handleCheckboxChange = useCallback(
+    (prefCode: number, checked: boolean) => {
+      const pref = prefCodeMap.get(prefCode);
+      if (pref) {
+        onChange(pref, checked);
+      }
     },
-    [allPopulationData]
+    [prefCodeMap, onChange]
   );
 
-  const populationCompositions = useMemo(() => {
-    const map = new Map<
+  // 人口データを事前に計算（最適化版）
+  const { populationCompositions, populationMap } = useMemo(() => {
+    const compositionMap = new Map<
       number,
       { youth: number; workingAge: number; elderly: number }
     >();
-    for (const data of allPopulationData) {
-      const composition = getPopulationComposition(data.prefCode);
-      if (composition) {
-        map.set(data.prefCode, composition);
-      }
-    }
-    return map;
-  }, [allPopulationData, getPopulationComposition]);
+    const totalMap = new Map<number, number>();
 
-  // 総人口を計算
-  const populationMap = useMemo(() => {
-    const map = new Map<number, number>();
+    // 1回のループで両方計算
     allPopulationData.forEach((data) => {
-      const latestData = data.totalPopulation[data.totalPopulation.length - 1];
-      map.set(data.prefCode, latestData?.value || 0);
+      const targetYear = data.boundaryYear;
+
+      // 構成データ
+      const youth =
+        data.youthPopulation.find((d) => d.year === targetYear)?.value ?? 0;
+      const workingAge =
+        data.workingAgePopulation.find((d) => d.year === targetYear)?.value ??
+        0;
+      const elderly =
+        data.elderlyPopulation.find((d) => d.year === targetYear)?.value ?? 0;
+
+      compositionMap.set(data.prefCode, { youth, workingAge, elderly });
+
+      // 総人口
+      const totalData = data.totalPopulation.find(
+        (d) => d.year === targetYear
+      );
+      totalMap.set(data.prefCode, totalData?.value || 0);
     });
-    return map;
+
+    return {
+      populationCompositions: compositionMap,
+      populationMap: totalMap,
+    };
   }, [allPopulationData]);
 
   return (
@@ -86,4 +85,4 @@ export function PrefectureSelection({
       })}
     </div>
   );
-}
+});
