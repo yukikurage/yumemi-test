@@ -1,9 +1,9 @@
-import type { RefObject } from "react";
 import type { components } from "@/generated/api";
 import { SearchInput } from "./SearchInput";
-import { PieChartLegend } from "./PieChartLegend";
 import { PrefectureSelection } from "./PrefectureSelection";
 import type { AllPopulationData } from "./PopulationPage";
+import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
+import { PieChartLegend } from "./PieChartLegend";
 
 type Prefecture = components["schemas"]["Prefecture"];
 
@@ -14,7 +14,6 @@ type PrefectureSelectionPanelProps = {
   allPopulationData: AllPopulationData[];
   onChange: (pref: Prefecture, selected: boolean) => void;
   selectedPrefs: Set<number>;
-  scrollRef?: RefObject<HTMLDivElement | null>;
   mobileBottom?: string;
   mobileTop?: string;
 };
@@ -26,23 +25,26 @@ export function PrefectureSelectionPanel({
   allPopulationData,
   onChange,
   selectedPrefs,
-  scrollRef,
   mobileBottom,
   mobileTop,
 }: PrefectureSelectionPanelProps) {
+  const scrollRef = useHorizontalScroll<HTMLDivElement>();
   return (
     <>
       <div
-        className="lg:hidden fixed left-0 right-0 h-fit flex flex-col gap-3 items-start justify-end transition-all duration-300"
+        className="fixed left-0 right-0 h-fit flex flex-col gap-3 items-start justify-end transition-all duration-300"
         style={{
           bottom: mobileBottom,
           top: mobileTop,
         }}
       >
-        <div className="w-full px-4 pt-4 h-fit flex flex-col items-stretch gap-3">
+        <div className="w-full lg:w-fit px-4 pt-4 h-fit">
           <SearchInput value={searchQuery} onChange={setSearchQuery} />
         </div>
-        <div className="w-full h-fit overflow-auto">
+        <div className="justify-start lg:flex-none hidden lg:flex px-4">
+          <PieChartLegend />
+        </div>
+        <div ref={scrollRef} className="w-full h-fit overflow-auto">
           <div className="px-4 pb-4 h-fit w-fit">
             <PrefectureSelection
               prefectures={filteredPrefectures}
@@ -53,7 +55,7 @@ export function PrefectureSelectionPanel({
           </div>
         </div>
       </div>
-      <div className="hidden lg:flex fixed left-0 right-0 bottom-0 h-fit flex-col gap-4 items-start justify-end">
+      {/* <div className="hidden lg:flex fixed left-0 right-0 bottom-0 h-fit flex-col gap-4 items-start justify-end">
         <div className="w-full px-8 pt-4 h-fit flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-4">
           <div className="min-w-full lg:min-w-fit lg:flex-none">
             <SearchInput value={searchQuery} onChange={setSearchQuery} />
@@ -72,7 +74,7 @@ export function PrefectureSelectionPanel({
             />
           </div>
         </div>
-      </div>
+      </div> */}
     </>
   );
 }

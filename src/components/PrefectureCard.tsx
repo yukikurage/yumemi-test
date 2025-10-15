@@ -50,14 +50,14 @@ export const PrefectureCard = memo(function PrefectureCard({
     >
       {/* 左上：都道府県名と英語名 */}
       <div className="absolute top-2 lg:top-4 left-2 lg:left-4 text-left">
-        <div className="text-xs lg:text-base font-normal text-neutral-900">
+        <div className="text-sm lg:text-base font-normal text-neutral-900">
           {pref.prefName}
         </div>
-        <div className="text-[10px] lg:text-sm font-normal text-neutral-700 hidden lg:block">
+        <div className="text-xs lg:text-sm font-normal text-neutral-700 hidden lg:block">
           {englishName}
         </div>
         {totalPopulation && (
-          <div className="text-[9px] lg:text-xs font-medium text-neutral-600 mt-0.5 lg:mt-1">
+          <div className="text-[10px] lg:text-xs font-medium text-neutral-600 mt-0.5 lg:mt-1">
             {formatPopulation(totalPopulation)}
           </div>
         )}

@@ -48,9 +48,6 @@ export function useHorizontalScroll<T extends HTMLElement>() {
       // 横スクロール可能な要素でない場合は何もしない
       if (element.scrollWidth <= element.clientWidth) return;
 
-      // 縦スクロールがある場合はデフォルト動作を維持
-      if (e.deltaY === 0) return;
-
       // Shift キーが押されている場合もデフォルト動作だが、targetScrollLeftは更新する必要がある
       if (e.shiftKey) {
         // handleScrollで同期されるのでここでは何もしない
@@ -70,8 +67,12 @@ export function useHorizontalScroll<T extends HTMLElement>() {
         )
       );
 
+      console.log("wheel", e.deltaY, targetScrollLeft.current);
+
       // アニメーションが実行中でなければ開始
       if (scrollAnimationRef.current === null) {
+        console.log("start scroll animation");
+
         scrollAnimationRef.current = requestAnimationFrame(smoothScroll);
       }
     };
