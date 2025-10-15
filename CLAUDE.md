@@ -11,9 +11,22 @@ This is a Next.js 15.4.6 application configured for deployment on Cloudflare Wor
 ### Local Development
 ```bash
 pnpm dev          # Start dev server with Turbopack (runs on http://localhost:3000)
+pnpm dev:clean    # Kill stuck dev servers and start fresh
+pnpm cleanup      # Kill all Next.js dev server processes (useful for port conflicts)
 pnpm build        # Build production bundle
 pnpm start        # Start production server locally
 pnpm lint         # Run ESLint
+```
+
+**Troubleshooting Port Conflicts:**
+If you encounter `EADDRINUSE` errors (port already in use), run:
+```bash
+pnpm cleanup      # Kills all Next.js processes
+pnpm dev          # Start dev server
+```
+Or use the combined command:
+```bash
+pnpm dev:clean    # Cleanup + start in one command
 ```
 
 ### Cloudflare Deployment
