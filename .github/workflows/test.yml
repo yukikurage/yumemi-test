@@ -32,7 +32,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run linter
-        run: NEXTJS_ENV=production pnpm lint
+        run: pnpm lint
 
       - name: Run tests
         run: pnpm test --forceExit

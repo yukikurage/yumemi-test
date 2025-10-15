@@ -1,11 +1,19 @@
 import type { NextConfig } from "next";
 
-// added by create cloudflare to enable calling `getCloudflareContext()` in `next dev`
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-initOpenNextCloudflareForDev();
+
+// COMMENTED OUT: Cloudflare initialization causes wrangler login issues in dev mode
+// This can be re-enabled when deploying or when logged into wrangler
+// if (process.env.NODE_ENV !== "test") {
+//
+// }
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
 };
+
+if (process.env.NODE_ENV === "development") {
+  initOpenNextCloudflareForDev();
+}
 
 export default nextConfig;
