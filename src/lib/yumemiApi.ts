@@ -1,4 +1,4 @@
-import { client } from "./apiClient";
+import { createApiClient } from "./apiClient";
 
 /**
  * 都道府県一覧を取得
@@ -13,6 +13,7 @@ import { client } from "./apiClient";
  * ```
  */
 export async function getPrefectures() {
+  const client = await createApiClient();
   const { data, error } = await client.GET("/api/v1/prefectures");
 
   if (error) {
@@ -37,6 +38,7 @@ export async function getPrefectures() {
  * ```
  */
 export async function getPopulationComposition(prefCode: number) {
+  const client = await createApiClient();
   const { data, error } = await client.GET(
     "/api/v1/population/composition/perYear",
     {

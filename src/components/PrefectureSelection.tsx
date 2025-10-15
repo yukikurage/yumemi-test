@@ -60,17 +60,30 @@ export function PrefectureSelection({
     return map;
   }, [allPopulationData, getPopulationComposition]);
 
+  // 総人口を計算
+  const populationMap = useMemo(() => {
+    const map = new Map<number, number>();
+    allPopulationData.forEach((data) => {
+      const latestData = data.totalPopulation[data.totalPopulation.length - 1];
+      map.set(data.prefCode, latestData?.value || 0);
+    });
+    return map;
+  }, [allPopulationData]);
+
   return (
-    <div className="w-fit h-36 overflow-visible flex gap-4 flex-nowrap">
-      {prefectures.map((pref) => (
-        <PrefectureCard
-          key={pref.prefCode}
-          pref={pref}
-          checked={selectedPrefs.has(pref.prefCode)}
-          onChange={(checked) => handleCheckboxChange(pref.prefCode, checked)}
-          populationComposition={populationCompositions.get(pref.prefCode)}
-        />
-      ))}
+    <div className="w-fit h-20 md:h-36 overflow-visible flex items-end gap-2 md:gap-4 flex-nowrap">
+      {prefectures.map((pref) => {
+        return (
+          <PrefectureCard
+            key={pref.prefCode}
+            pref={pref}
+            checked={selectedPrefs.has(pref.prefCode)}
+            onChange={(checked) => handleCheckboxChange(pref.prefCode, checked)}
+            populationComposition={populationCompositions.get(pref.prefCode)}
+            totalPopulation={populationMap.get(pref.prefCode)}
+          />
+        );
+      })}
     </div>
   );
 }

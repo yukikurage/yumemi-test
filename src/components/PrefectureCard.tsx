@@ -17,6 +17,8 @@ export type PrefectureCardProps = {
     workingAge: number;
     elderly: number;
   };
+  // 総人口
+  totalPopulation?: number;
 };
 
 export const PrefectureCard = memo(function PrefectureCard({
@@ -24,31 +26,46 @@ export const PrefectureCard = memo(function PrefectureCard({
   checked,
   onChange,
   populationComposition,
+  totalPopulation,
 }: PrefectureCardProps) {
   const englishName = getPrefectureEnglishName(pref.prefCode);
 
+  const formatPopulation = (value: number) => {
+    if (value >= 10000000) {
+      return `${(value / 10000000).toFixed(1)}千万人`;
+    } else if (value >= 10000) {
+      return `${Math.round(value / 10000)}万人`;
+    }
+    return `${value}人`;
+  };
+
   return (
     <button
-      className={`relative w-64 h-36 shrink-0 p-4 cursor-pointer hover:shadow-lg active:shadow-md transition-all rounded-md border-2 ${
+      className={`relative backdrop-blur-sm w-32 md:w-64 h-20 md:h-36 shrink-0 p-2 md:p-4 cursor-pointer hover:shadow-lg active:shadow-md transition-all rounded-md border ${
         checked
-          ? "border-primary-border bg-primary-background"
-          : "border-neutral-100 bg-white"
+          ? "border-primary-border bg-primary-background/80"
+          : "border-neutral-200 bg-white/90"
       }`}
       onClick={() => onChange(!checked)}
     >
       {/* 左上：都道府県名と英語名 */}
-      <div className="absolute top-4 left-4 text-left">
-        <div className="text-base font-normal text-neutral-900">
+      <div className="absolute top-2 md:top-4 left-2 md:left-4 text-left">
+        <div className="text-xs md:text-base font-normal text-neutral-900">
           {pref.prefName}
         </div>
-        <div className="text-sm font-normal text-neutral-700">
+        <div className="text-[10px] md:text-sm font-normal text-neutral-700 hidden md:block">
           {englishName}
         </div>
+        {totalPopulation && (
+          <div className="text-[9px] md:text-xs font-medium text-neutral-600 mt-0.5 md:mt-1">
+            {formatPopulation(totalPopulation)}
+          </div>
+        )}
       </div>
 
-      {/* 右下：円グラフ */}
+      {/* 右下：円グラフ（デスクトップのみ） */}
       {populationComposition && (
-        <div className="absolute bottom-4 right-4 overflow-visible w-16 h-16 flex items-center justify-center">
+        <div className="hidden md:flex absolute bottom-4 right-4 overflow-visible w-16 h-16 items-center justify-center">
           <PopulationPieChart
             youth={populationComposition.youth}
             workingAge={populationComposition.workingAge}
@@ -59,8 +76,8 @@ export const PrefectureCard = memo(function PrefectureCard({
       )}
 
       {/* 左下：Detail ボタンと矢印 */}
-      <div className="absolute bottom-4 left-4 flex items-center gap-2">
-        <span className="text-xs font-bold text-neutral-700">Detail</span>
+      <div className="absolute bottom-2 md:bottom-4 left-2 md:left-4 flex items-center gap-1 md:gap-2">
+        <span className="text-[9px] md:text-xs font-bold text-neutral-700">Compare</span>
         <svg
           className="w-3 h-3 text-neutral-700"
           fill="none"

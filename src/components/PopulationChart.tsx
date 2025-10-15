@@ -25,10 +25,12 @@ export const PopulationChart = memo(function PopulationChart({
   prefectures,
   populationData,
   onRemovePrefecture,
+  compact = false,
 }: {
   prefectures: Prefecture[];
   populationData: Map<number, AllPopulationData>;
   onRemovePrefecture: (prefCode: number) => void;
+  compact?: boolean;
 }) {
   const [selectedAgeGroup, setSelectedAgeGroup] = useState<AgeGroup>("total");
 
@@ -98,7 +100,10 @@ export const PopulationChart = memo(function PopulationChart({
   return (
     <div className="flex flex-col h-fit gap-4">
       {/* 選択中の県のチップ表示 */}
-      <div className="flex flex-wrap gap-2">
+      <div
+        className="flex flex-wrap gap-2"
+        style={{ display: compact ? "none" : "flex" }}
+      >
         {selectedPrefectures.map((pref) => (
           <PrefectureChip
             key={pref.prefCode}
@@ -109,7 +114,7 @@ export const PopulationChart = memo(function PopulationChart({
       </div>
 
       {/* 年齢層選択UI */}
-      <div>
+      <div style={{ display: compact ? "none" : "block" }}>
         <AgeGroupSelector
           selected={selectedAgeGroup}
           onChange={setSelectedAgeGroup}
@@ -118,7 +123,7 @@ export const PopulationChart = memo(function PopulationChart({
 
       {/* グラフ */}
       <div className="flex-shrink-0">
-        <ResponsiveContainer width="100%" height={280}>
+        <ResponsiveContainer width="100%" height={compact ? 200 : 280}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
@@ -163,7 +168,10 @@ export const PopulationChart = memo(function PopulationChart({
       </div>
 
       {/* 統計情報 */}
-      <div className="flex-shrink-0">
+      <div
+        className="flex-shrink-0"
+        style={{ display: compact ? "none" : "block" }}
+      >
         <PopulationStats
           selectedCount={stats.selectedCount}
           totalPopulation={stats.totalPopulation}
@@ -171,7 +179,10 @@ export const PopulationChart = memo(function PopulationChart({
       </div>
 
       {/* 人口データテーブル */}
-      <div className="flex-1 overflow-hidden">
+      <div
+        className="flex-1 overflow-hidden"
+        style={{ display: compact ? "none" : "block" }}
+      >
         <PopulationTable
           prefectures={prefectures}
           populationData={populationData}

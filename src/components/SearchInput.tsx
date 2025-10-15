@@ -1,4 +1,4 @@
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 export type SearchInputProps = {
   onChange?: (value: string) => void;
@@ -6,6 +6,8 @@ export type SearchInputProps = {
 };
 
 export function SearchInput({ onChange, value }: SearchInputProps) {
+  const hasValue = value && value.length > 0;
+
   return (
     <div className="w-full h-fit relative">
       <input
@@ -16,7 +18,17 @@ export function SearchInput({ onChange, value }: SearchInputProps) {
         value={value}
       />
       <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
-        <MagnifyingGlassIcon className="w-5 h-5" />
+        {hasValue ? (
+          <button
+            onClick={() => onChange?.("")}
+            className="hover:text-slate-600 transition-colors"
+            aria-label="検索をクリア"
+          >
+            <XMarkIcon className="w-5 h-5" />
+          </button>
+        ) : (
+          <MagnifyingGlassIcon className="w-5 h-5" />
+        )}
       </div>
     </div>
   );
