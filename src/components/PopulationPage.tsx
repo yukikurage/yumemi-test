@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import type { components } from "@/generated/api";
-import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
 import { searchPrefectures } from "@/lib/searchPrefectures";
 import { JapanMap } from "./JapanMap";
 import { DesktopGraphPanel } from "./DesktopGraphPanel";
@@ -28,7 +27,6 @@ export function PopulationPage({
   allPopulationData: AllPopulationData[];
 }) {
   const [selectedPrefs, setSelectedPrefs] = useState<Set<number>>(new Set());
-  const scrollRef = useHorizontalScroll<HTMLDivElement>();
 
   const [searchQuery, setSearchQuery] = useState("");
   // モバイルのグラフ表示状態: "hidden" | "compact" | "expanded"

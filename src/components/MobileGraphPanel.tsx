@@ -28,7 +28,7 @@ export function MobileGraphPanel({
 
   return (
     <div
-      className="lg:hidden fixed left-0 right-0 border-t border-neutral-200 shadow-lg z-10 overflow-auto transition-all duration-300 rounded-t-4xl"
+      className="lg:hidden fixed left-0 right-0 border-t bottom-0 border-neutral-200 shadow-lg z-10 transition-all duration-300 rounded-t-4xl flex flex-col"
       style={{
         bottom: 0,
         top:
@@ -59,7 +59,7 @@ export function MobileGraphPanel({
         </button>
       </div>
 
-      <div className="relative p-4 bg-white">
+      <div className="relative p-4 bg-white grow overflow-auto">
         <PopulationChart
           prefectures={prefectures}
           populationData={populationData}
