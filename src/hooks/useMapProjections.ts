@@ -14,14 +14,37 @@ export function useMapProjections(dimensions: {
       .translate([dimensions.width * 0.45, dimensions.height * 0.42]);
   }, [dimensions.width, dimensions.height]);
 
-  // 沖縄用の投影設定（左上に表示）
+  // 沖縄用の投影設定（左上に表示、アスペクト比に応じて位置調整）
   const okinawaProjection = useMemo(() => {
+    const aspectRatio = dimensions.width / dimensions.height;
     const okinawaScale =
       Math.min(dimensions.width, dimensions.height) * 3.5 * 0.9;
+
+    // アスペクト比に応じて沖縄のX位置をスムーズに調整
+    // aspectRatio = 0.7 (縦長) → xRatio = 0.15
+    // aspectRatio = 1.5 (横長) → xRatio = 0.3
+    // 線形補間でスムーズに変化
+    const minAspect = 0.7;
+    const maxAspect = 1.5;
+    const minXRatio = 0.15;
+    const maxXRatio = 0.3;
+
+    const clampedAspect = Math.max(
+      minAspect,
+      Math.min(maxAspect, aspectRatio)
+    );
+    const xRatio =
+      minXRatio +
+      ((clampedAspect - minAspect) / (maxAspect - minAspect)) *
+        (maxXRatio - minXRatio);
+
+    const translateX = dimensions.width * xRatio;
+    const translateY = dimensions.height * 0.15;
+
     return geoMercator()
-      .center([127, 26.2])
+      .center([123, 26.2])
       .scale(okinawaScale)
-      .translate([dimensions.width * 0.3, dimensions.height * 0.15]);
+      .translate([translateX, translateY]);
   }, [dimensions.width, dimensions.height]);
 
   const mainPathGenerator = useMemo(() => {

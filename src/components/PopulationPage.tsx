@@ -144,17 +144,6 @@ export function PopulationPage({
         onRemovePrefecture={handleRemovePrefecture}
       />
 
-      {/* 下部：検索バーと都道府県選択（デスクトップ） */}
-      <PrefectureSelectionPanel
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        filteredPrefectures={filteredPrefectures}
-        allPopulationData={allPopulationData}
-        onChange={handleChangeSelections}
-        selectedPrefs={selectedPrefs}
-        scrollRef={scrollRef}
-      />
-
       {/* 下部：検索バーと都道府県選択（モバイル） */}
       <PrefectureSelectionPanel
         searchQuery={searchQuery}
@@ -163,10 +152,9 @@ export function PopulationPage({
         allPopulationData={allPopulationData}
         onChange={handleChangeSelections}
         selectedPrefs={selectedPrefs}
-        isMobile
         mobileBottom={
           mobileGraphState === "compact"
-            ? "280px"
+            ? "340px"
             : mobileGraphState === "expanded"
               ? "auto"
               : "0"

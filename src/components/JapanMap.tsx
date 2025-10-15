@@ -121,6 +121,28 @@ export const JapanMap = memo(function JapanMap({
     return { okinawa, mainPrefectures };
   }, [geoData]);
 
+  // 沖縄ラベルの位置（アスペクト比に応じて調整）
+  const okinawaLabelPos = useMemo(() => {
+    const aspectRatio = dimensions.width / dimensions.height;
+
+    // useMapProjectionsと同じロジックで計算
+    const minAspect = 0.7;
+    const maxAspect = 1.5;
+    const minXRatio = 0.15;
+    const maxXRatio = 0.3;
+
+    const clampedAspect = Math.max(minAspect, Math.min(maxAspect, aspectRatio));
+    const xRatio =
+      minXRatio +
+      ((clampedAspect - minAspect) / (maxAspect - minAspect)) *
+        (maxXRatio - minXRatio);
+
+    return {
+      x: dimensions.width * xRatio,
+      y: dimensions.height * 0.2,
+    };
+  }, [dimensions]);
+
   return (
     <div
       ref={containerRef}
@@ -177,13 +199,14 @@ export const JapanMap = memo(function JapanMap({
 
         {/* 斜め線で区切る（右上から左下へ、45度に近づける） */}
         <line
-          x1={dimensions.width * 0.44}
+          x1={dimensions.width * 0.5}
           y1={dimensions.height * 0.12}
-          x2={dimensions.width * 0.32}
+          x2={dimensions.width * 0.4}
           y2={dimensions.height * 0.36}
           stroke="#94a3b8"
           strokeWidth={1}
           strokeDasharray="8,4"
+          vectorEffect="non-scaling-stroke"
         />
 
         {/* 沖縄県（斜め線の左上側に配置） */}
@@ -203,8 +226,8 @@ export const JapanMap = memo(function JapanMap({
 
             {/* 沖縄県ラベル */}
             <text
-              x={dimensions.width * 0.2}
-              y={dimensions.height * 0.2}
+              x={okinawaLabelPos.x}
+              y={okinawaLabelPos.y}
               textAnchor="middle"
               fontSize={14}
               fill="#64748b"

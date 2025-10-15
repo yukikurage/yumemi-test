@@ -28,13 +28,13 @@ export function MobileGraphPanel({
 
   return (
     <div
-      className="lg:hidden fixed left-0 right-0 bg-white border-t border-neutral-200 shadow-lg z-10 overflow-auto transition-all duration-300 rounded-t-4xl"
+      className="lg:hidden fixed left-0 right-0 border-t border-neutral-200 shadow-lg z-10 overflow-auto transition-all duration-300 rounded-t-4xl"
       style={{
         bottom: 0,
         top:
           mobileGraphState === "expanded"
-            ? "calc(64px + 200px)"
-            : "calc(100dvh - 280px)",
+            ? "calc(28px + 200px)"
+            : "calc(100dvh - 340px)",
       }}
     >
       <div className="flex items-center justify-center sticky top-0 z-10 w-full">
@@ -59,7 +59,7 @@ export function MobileGraphPanel({
         </button>
       </div>
 
-      <div className="relative p-4">
+      <div className="relative p-4 bg-white">
         <PopulationChart
           prefectures={prefectures}
           populationData={populationData}
