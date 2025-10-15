@@ -29,13 +29,14 @@ export function PrefectureSelectionPanel({
   mobileTop,
 }: PrefectureSelectionPanelProps) {
   const scrollRef = useHorizontalScroll<HTMLDivElement>();
+
   return (
     <>
       <div
-        className="fixed left-0 right-0 h-fit flex flex-col gap-3 items-start justify-end transition-all duration-300"
+        className="fixed left-0 right-0 bottom-[var(--mobile-bottom)] lg:bottom-0 top-[var(--mobile-top)] h-fit flex flex-col gap-3 items-start justify-end transition-all duration-300"
         style={{
-          bottom: mobileBottom,
-          top: mobileTop,
+          "--mobile-bottom": mobileBottom ?? "16px",
+          "--mobile-top": mobileTop ?? "auto",
         }}
       >
         <div className="w-full lg:w-fit px-4 pt-4 h-fit">
