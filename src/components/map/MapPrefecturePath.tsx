@@ -34,10 +34,19 @@ export const MapPrefecturePath = memo(function MapPrefecturePath({
       d={pathData || undefined}
       className="prefecture cursor-pointer transition-all duration-200 hover:opacity-70"
       fill={fillColor}
-      stroke="var(--base-color-100)"
+      stroke="#ffffff"
       strokeWidth={1}
       vectorEffect="non-scaling-stroke"
       onClick={() => onPrefectureClick(prefName)}
+      role="button"
+      aria-label={`${prefName}を選択`}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onPrefectureClick(prefName);
+        }
+      }}
     >
       <title>{prefName}</title>
     </path>

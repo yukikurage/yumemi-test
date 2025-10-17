@@ -47,6 +47,8 @@ export const PrefectureCard = memo(function PrefectureCard({
           : "outline-base-color-200 bg-white/92"
       }`}
       onClick={() => onChange(!checked)}
+      aria-label={`${pref.prefName}を${checked ? "選択解除" : "選択"}`}
+      aria-pressed={checked}
     >
       {/* 左上：都道府県名と英語名 */}
       <div className="absolute top-2 xl:top-4 left-2 xl:left-4 text-left">

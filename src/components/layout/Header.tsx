@@ -1,3 +1,5 @@
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+
 export function Header() {
   return (
     <header className="w-full h-16 xl:h-20 bg-white/92 backdrop-blur-md border-b border-base-color-200 flex items-center justify-start xl:justify-center px-4 xl:px-8 relative z-10">
@@ -12,12 +14,13 @@ export function Header() {
           JP
         </span>
       </div>
-      <div className="absolute right-4 xl:right-8 h-full flex items-center">
+      <div className="absolute right-4 xl:right-8 h-full flex items-center gap-4">
+        <ThemeToggle />
         <a
           href="https://github.com/yukikurage/yumemi-test"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-base-color-700 hover:text-base-color-900 transition-colors"
+          className="flex items-center justify-center gap-2 text-base-color-700 hover:text-base-color-900 transition-colors rounded-full border border-base-color-200 h-10 w-10 xl:w-fit p-0 xl:px-4 hover:bg-base-color-50"
           aria-label="View source on GitHub"
         >
           <svg

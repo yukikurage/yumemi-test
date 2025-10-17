@@ -15,7 +15,7 @@ export function usePopulationColorMap(
   allPopulationData: AllPopulationData[],
   ageGroup: AgeGroup = "total"
 ) {
-  return useMemo(() => {
+  const result = useMemo(() => {
     const map = new Map<number, string>();
 
     // boundaryYearの人口データを取得
@@ -49,15 +49,30 @@ export function usePopulationColorMap(
     const maxPopulation = Math.max(...populations.map((p) => p.population));
     const minPopulation = Math.min(...populations.map((p) => p.population));
 
-    // 各都道府県の色を計算（緑のグラデーション）
+    // 人口比率から色を計算する関数
+    const getColorFromRatio = (ratio: number) => {
+      const hue = 100 - ratio * 95; // 100 (緑) から 5 (赤) へ
+      const lightness = 60 + (1 - ratio) * 5;
+      return `hsl(${hue}, 70%, ${lightness}%)`;
+    };
+    // 各都道府県の色を計算
     populations.forEach(({ prefCode, population }) => {
       const ratio =
         (population - minPopulation) / (maxPopulation - minPopulation);
-      // 薄い緑から濃い緑へのグラデーション
-      const lightness = 85 - ratio * 45; // 85% -> 40%
-      map.set(prefCode, `hsl(140, 60%, ${lightness}%)`);
+      // 小さい ratio の範囲はより大きく変化させる
+      const colorRatio = Math.pow(ratio, 0.35);
+      map.set(prefCode, getColorFromRatio(colorRatio));
     });
 
-    return map;
+    return {
+      populationColorMap: map,
+      minPopulation,
+      minColor: getColorFromRatio(0), // 最小（ratio=0）の色
+      maxPopulation,
+      maxColor: getColorFromRatio(1), // 最大（ratio=1）の色
+      getColorFromRatio,
+    };
   }, [allPopulationData, ageGroup]);
+
+  return result;
 }

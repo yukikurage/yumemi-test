@@ -17,7 +17,11 @@ export function AgeGroupSelector({
   onChange,
 }: AgeGroupSelectorProps) {
   return (
-    <div className="w-full xl:w-fit flex rounded-full border border-base-color-200 bg-white/92 backdrop-blur-md">
+    <div
+      className="w-full xl:w-fit flex rounded-full border border-base-color-200 bg-white/92 backdrop-blur-md"
+      role="group"
+      aria-label="年齢層を選択"
+    >
       {AGE_GROUPS.map((group) => (
         <button
           key={group.value}
@@ -30,6 +34,8 @@ export function AgeGroupSelector({
                 : "text-base-color-600 hover:text-base-color-900 border-transparent"
             }
           `}
+          aria-label={group.label}
+          aria-pressed={selected === group.value}
         >
           {group.label}
         </button>

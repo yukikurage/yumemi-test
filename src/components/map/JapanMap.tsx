@@ -7,6 +7,7 @@ import { usePopulationColorMap } from "@/hooks/usePopulationColorMap";
 import { useMapZoom } from "@/hooks/useMapZoom";
 import { useMapData } from "@/hooks/useMapData";
 import { MapPrefecturePath } from "@/components/map/MapPrefecturePath";
+import { ColorLegend } from "@/components/map/ColorLegend";
 
 type Prefecture = components["schemas"]["Prefecture"];
 
@@ -37,7 +38,10 @@ export const JapanMap = memo(function JapanMap({
   mobileGraphState,
 }: JapanMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 1600, height: 900 });
+  const [dimensions, setDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -58,7 +62,7 @@ export const JapanMap = memo(function JapanMap({
   // ViewBoxを更新する関数 (useMapZoomフックから呼ばれる)
   const updateViewBox = useCallback(
     (currentZoom: number, currentPan: { x: number; y: number }) => {
-      if (!svgRef.current) return;
+      if (!svgRef.current || !dimensions) return;
 
       const baseWidth = dimensions.width;
       const baseHeight = dimensions.height;
@@ -92,11 +96,12 @@ export const JapanMap = memo(function JapanMap({
     handleTouchMove,
     handleTouchEnd,
     setOffset,
-  } = useMapZoom(dimensions, updateViewBox);
+  } = useMapZoom(dimensions || { width: 1600, height: 900 }, updateViewBox);
 
   // カスタムフックで投影設定を取得
-  const { mainPathGenerator, okinawaPathGenerator } =
-    useMapProjections(dimensions);
+  const { mainPathGenerator, okinawaPathGenerator } = useMapProjections(
+    dimensions || { width: 1600, height: 900 }
+  );
 
   // 都道府県名から都道府県コードを取得するマップ
   const nameToCodeMap = useMemo(() => {
@@ -108,7 +113,12 @@ export const JapanMap = memo(function JapanMap({
   }, [prefectures]);
 
   // カスタムフックで人口データから色を計算
-  const populationColorMap = usePopulationColorMap(allPopulationData, "total");
+  const {
+    populationColorMap,
+    minPopulation,
+    maxPopulation,
+    getColorFromRatio,
+  } = usePopulationColorMap(allPopulationData, "total");
 
   // グラフエリアが開いたときに地図をずらす
   useEffect(() => {
@@ -146,6 +156,7 @@ export const JapanMap = memo(function JapanMap({
 
   // 沖縄ラベルの位置（アスペクト比に応じて調整）
   const okinawaLabelPos = useMemo(() => {
+    if (!dimensions) return { x: 0, y: 0 };
     const aspectRatio = dimensions.width / dimensions.height;
 
     // useMapProjectionsと同じロジックで計算
@@ -166,11 +177,28 @@ export const JapanMap = memo(function JapanMap({
     };
   }, [dimensions]);
 
+  // dimensionsが初期化されていない場合は早期リターン
+  if (!dimensions) {
+    return (
+      <div
+        ref={containerRef}
+        className="w-full h-full flex items-center justify-center text-primary relative overflow-hidden"
+      />
+    );
+  }
+
   return (
     <div
       ref={containerRef}
       className="w-full h-full flex items-center justify-center text-primary relative overflow-hidden"
     >
+      {/* 色の凡例 */}
+      <ColorLegend
+        minPopulation={minPopulation}
+        maxPopulation={maxPopulation}
+        getColorFromRatio={getColorFromRatio}
+      />
+
       <svg
         ref={svgRef}
         className={`w-full h-full ${
@@ -191,6 +219,8 @@ export const JapanMap = memo(function JapanMap({
         onTouchCancel={handleTouchEnd}
         preserveAspectRatio="xMidYMid meet"
         style={{ touchAction: "none" }}
+        role="img"
+        aria-label="日本地図 - 都道府県を選択できます"
       >
         {/* メインの都道府県（沖縄除く） */}
         <g className="main-prefectures">
