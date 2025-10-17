@@ -27,7 +27,7 @@ export function AgeGroupSelector({
           key={group.value}
           onClick={() => onChange(group.value)}
           className={`
-            border-2 min-w-28 xl:min-w-32 h-8 text-sm font-medium transition-all cursor-pointer grow rounded-full
+            border-2 px-2 sm:px-0 sm:min-w-28 xl:min-w-32 h-8 text-sm font-medium transition-all cursor-pointer grow rounded-full
             ${
               selected === group.value
                 ? "text-primary-text font-bold shadow-sm bg-primary-background border-primary-border "

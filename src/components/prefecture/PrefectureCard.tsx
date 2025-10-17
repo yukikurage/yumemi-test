@@ -41,7 +41,7 @@ export const PrefectureCard = memo(function PrefectureCard({
 
   return (
     <button
-      className={`relative backdrop-blur-md w-32 xl:w-64 h-20 xl:h-36 shrink-0 p-2 xl:p-4 cursor-pointer hover:shadow-lg active:shadow-md transition-all rounded-md outline ${
+      className={`relative backdrop-blur-md w-24 sm:w-32 xl:w-64 h-16 sm:h-20 xl:h-36 shrink-0 p-2 xl:p-4 cursor-pointer hover:shadow-lg active:shadow-md transition-all rounded-md outline ${
         checked
           ? "outline-2 outline-primary-border bg-primary-background/92"
           : "outline-base-color-200 bg-white/92"
@@ -80,7 +80,7 @@ export const PrefectureCard = memo(function PrefectureCard({
       )}
 
       {/* 左下：Detail ボタンと矢印 */}
-      <div className="absolute bottom-2 xl:bottom-4 left-2 xl:left-4 flex items-center gap-1 xl:gap-2">
+      <div className="hidden sm:flex absolute bottom-2 xl:bottom-4 left-2 xl:left-4items-center gap-1 xl:gap-2">
         <span className="text-[9px] xl:text-xs font-bold text-base-color-700">
           Compare
         </span>

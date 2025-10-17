@@ -40,7 +40,7 @@ export function PrefectureSelectionPanel({
         }}
       >
         <div className="w-full px-4 h-fit flex justify-between items-center">
-          <div className="max-w-96">
+          <div className="w-full xl:max-w-96">
             <SearchInput value={searchQuery} onChange={setSearchQuery} />
           </div>
           <div className="hidden xl:flex h-full justify-end items-center">

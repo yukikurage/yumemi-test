@@ -68,14 +68,16 @@ export const PrefectureSelection = memo(function PrefectureSelection({
   }, [allPopulationData]);
 
   return (
-    <ul className="w-fit h-20 xl:h-36 overflow-visible flex items-end gap-2 xl:gap-4 flex-nowrap list-none m-0 p-0">
+    <ul className="w-fit h-fit overflow-visible flex items-end gap-2 xl:gap-4 flex-nowrap list-none m-0 p-0">
       {prefectures.map((pref) => {
         return (
           <li key={pref.prefCode}>
             <PrefectureCard
               pref={pref}
               checked={selectedPrefs.has(pref.prefCode)}
-              onChange={(checked) => handleCheckboxChange(pref.prefCode, checked)}
+              onChange={(checked) =>
+                handleCheckboxChange(pref.prefCode, checked)
+              }
               populationComposition={populationCompositions.get(pref.prefCode)}
               totalPopulation={populationMap.get(pref.prefCode)}
             />
