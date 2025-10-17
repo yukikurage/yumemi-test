@@ -24,7 +24,7 @@ export function useMapZoom(
 
   // 2本指（Pointer）管理
   const ptrs = useRef<Map<number, XY>>(new Map());
-  const pinchBase = useRef<{ d: number; c: XY } | null>(null);
+  const pinchBase = useRef<{ d: number; c: XY; zoom: number } | null>(null);
 
   // offset
   const offset = useRef<XY>({ x: 0, y: 0 });
@@ -121,7 +121,12 @@ export function useMapZoom(
       const [p1, p2] = Array.from(ptrs.current.values()).slice(0, 2);
       const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
       const c = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
-      pinchBase.current = { d, c };
+
+      pinchBase.current = {
+        d,
+        c,
+        zoom: zoom.current, // ✅ ← ピンチ開始時のズーム値を保存
+      };
       setDragging(false); // 競合回避
     }
   }, []);
@@ -142,7 +147,7 @@ export function useMapZoom(
         const currentZoom = zoom.current;
         const nextZoom = Math.max(
           MIN_ZOOM,
-          Math.min(MAX_ZOOM, currentZoom * adjusted)
+          Math.min(MAX_ZOOM, base.zoom * adjusted)
         );
 
         const rect = svg.getBoundingClientRect();
