@@ -89,12 +89,9 @@ export const JapanMap = memo(function JapanMap({
     zoom,
     isDragging,
     handleWheel,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
     setOffset,
   } = useMapZoom(dimensions || { width: 1600, height: 900 }, updateViewBox);
 
@@ -210,14 +207,10 @@ export const JapanMap = memo(function JapanMap({
               : "cursor-default"
         }`}
         onWheel={(e) => handleWheel(e, svgRef.current!)}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={(e) => handleTouchMove(e, svgRef.current!)}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
+        onPointerDown={onPointerDown}
+        onPointerMove={(e) => onPointerMove(e, svgRef.current!)}
+        onPointerUp={onPointerUp}
+        onPointerLeave={onPointerUp}
         preserveAspectRatio="xMidYMid meet"
         style={{ touchAction: "none" }}
         role="img"

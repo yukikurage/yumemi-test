@@ -3,253 +3,193 @@ import { useRef, useCallback, useState } from "react";
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 8;
 
+type XY = { x: number; y: number };
+
 export function useMapZoom(
   dimensions: { width: number; height: number },
-  updateViewBox: (zoom: number, pan: { x: number; y: number }) => void
+  updateViewBox: (zoom: number, pan: XY) => void
 ) {
+  // 状態
   const zoom = useRef(1);
-  const pan = useRef({ x: 0, y: 0 });
-  const targetZoom = useRef(1);
-  const targetPan = useRef({ x: 0, y: 0 });
-  const offset = useRef({ x: 0, y: 0 }); // グラフによるオフセット
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStart = useRef({ x: 0, y: 0 });
-  const animationFrame = useRef<number | null>(null);
-  const lastTouchDistance = useRef<number | null>(null);
-  const lastTouchCenter = useRef<{ x: number; y: number } | null>(null);
+  const pan = useRef<XY>({ x: 0, y: 0 });
 
-  const smoothAnimate = useCallback(() => {
-    const zoomDiff = targetZoom.current - zoom.current;
-    const panDiffX = targetPan.current.x - pan.current.x;
-    const panDiffY = targetPan.current.y - pan.current.y;
+  // 目標（スムース用）
+  const zT = useRef(1);
+  const pT = useRef<XY>({ x: 0, y: 0 });
+  const raf = useRef<number | null>(null);
 
-    if (
-      Math.abs(zoomDiff) < 0.001 &&
-      Math.abs(panDiffX) < 0.5 &&
-      Math.abs(panDiffY) < 0.5
-    ) {
-      zoom.current = targetZoom.current;
-      pan.current = targetPan.current;
-      animationFrame.current = null;
+  // 入力管理
+  const [isDragging, setDragging] = useState(false);
+  const dragStart = useRef<XY>({ x: 0, y: 0 });
+
+  // 2本指（Pointer）管理
+  const ptrs = useRef<Map<number, XY>>(new Map());
+  const pinchBase = useRef<{ d: number; c: XY } | null>(null);
+
+  // offset
+  const offset = useRef<XY>({ x: 0, y: 0 });
+
+  /** スムース更新 */
+  const tick = useCallback(() => {
+    const dz = zT.current - zoom.current;
+    const dx = pT.current.x - pan.current.x;
+    const dy = pT.current.y - pan.current.y;
+
+    if (Math.abs(dz) < 1e-3 && Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+      zoom.current = zT.current;
+      pan.current = pT.current;
+      raf.current = null;
       updateViewBox(zoom.current, pan.current);
       return;
     }
-
-    zoom.current += zoomDiff * 0.15;
+    zoom.current += dz * 0.15;
     pan.current = {
-      x: pan.current.x + panDiffX * 0.15,
-      y: pan.current.y + panDiffY * 0.15,
+      x: pan.current.x + dx * 0.15,
+      y: pan.current.y + dy * 0.15,
     };
-
     updateViewBox(zoom.current, pan.current);
-    animationFrame.current = requestAnimationFrame(smoothAnimate);
+    raf.current = requestAnimationFrame(tick);
   }, [updateViewBox]);
 
-  const startAnimation = useCallback(() => {
-    if (animationFrame.current === null) {
-      animationFrame.current = requestAnimationFrame(smoothAnimate);
-    }
-  }, [smoothAnimate]);
+  const schedule = useCallback(() => {
+    if (raf.current == null) raf.current = requestAnimationFrame(tick);
+  }, [tick]);
 
+  /** clamp */
+  const clampZoom = (z: number) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z));
+
+  /** 指定点を中心にズーム */
+  const zoomAt = useCallback(
+    (svg: SVGSVGElement, center: XY, scale: number) => {
+      const curr = zoom.current;
+      const next = clampZoom(curr * scale);
+      if (next === curr) return;
+
+      const rect = svg.getBoundingClientRect();
+      const relX = (center.x - rect.left) / rect.width;
+      const relY = (center.y - rect.top) / rect.height;
+
+      const w0 = dimensions.width / curr;
+      const h0 = dimensions.height / curr;
+      const w1 = dimensions.width / next;
+      const h1 = dimensions.height / next;
+
+      const { x, y } = pan.current;
+      pT.current = {
+        x: x + (w0 - w1) * relX,
+        y: y + (h0 - h1) * relY,
+      };
+      zT.current = next;
+      schedule();
+    },
+    [dimensions, schedule]
+  );
+
+  /** ドラッグでパン */
+  const panBy = useCallback(
+    (dx: number, dy: number) => {
+      const z = zoom.current;
+      pT.current = { x: pT.current.x + dx / z, y: pT.current.y + dy / z };
+      schedule();
+    },
+    [schedule]
+  );
+
+  /** Wheel（PC デバッグは ctrl/⌘ でピンチ代用） */
   const handleWheel = useCallback(
-    (e: React.WheelEvent<SVGSVGElement>, svgRef: SVGSVGElement) => {
-      const delta = e.deltaY > 0 ? 0.8 : 1.2;
-      const currentZoom = zoom.current;
-      const newZoom = Math.max(
-        MIN_ZOOM,
-        Math.min(MAX_ZOOM, currentZoom * delta)
-      );
-
-      const rect = svgRef.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      const relX = mouseX / rect.width;
-      const relY = mouseY / rect.height;
-
-      const currentWidth = dimensions.width / currentZoom;
-      const currentHeight = dimensions.height / currentZoom;
-      const newWidth = dimensions.width / newZoom;
-      const newHeight = dimensions.height / newZoom;
-
-      const currentPan = pan.current;
-      const newPanX = currentPan.x + (currentWidth - newWidth) * relX;
-      const newPanY = currentPan.y + (currentHeight - newHeight) * relY;
-
-      targetZoom.current = newZoom;
-      targetPan.current = { x: newPanX, y: newPanY };
-
-      startAnimation();
+    (e: React.WheelEvent<SVGSVGElement>, svg: SVGSVGElement) => {
+      e.preventDefault();
+      zoomAt(svg, { x: e.clientX, y: e.clientY }, e.deltaY > 0 ? 0.8 : 1.2);
     },
-    [dimensions, startAnimation]
+    [zoomAt]
   );
 
-  const handleMouseDown = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
-    if (zoom.current <= 1) return;
-    setIsDragging(true);
-    dragStart.current = { x: e.clientX, y: e.clientY };
-  }, []);
+  /** Pointer Events */
+  const onPointerDown = useCallback((e: React.PointerEvent<SVGSVGElement>) => {
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+    ptrs.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<SVGSVGElement>) => {
-      if (!isDragging || zoom.current <= 1) return;
-      const dx = (dragStart.current.x - e.clientX) / zoom.current;
-      const dy = (dragStart.current.y - e.clientY) / zoom.current;
-
-      targetPan.current = {
-        x: targetPan.current.x + dx,
-        y: targetPan.current.y + dy,
-      };
-
-      dragStart.current = { x: e.clientX, y: e.clientY };
-      startAnimation();
-    },
-    [isDragging, startAnimation]
-  );
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent<SVGSVGElement>) => {
-    if (e.touches.length === 1) {
-      if (zoom.current <= 1) return;
-      setIsDragging(true);
-      dragStart.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
-      };
-    } else if (e.touches.length === 2) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      );
-      lastTouchDistance.current = distance;
-      lastTouchCenter.current = {
-        x: (touch1.clientX + touch2.clientX) / 2,
-        y: (touch1.clientY + touch2.clientY) / 2,
-      };
+    if (ptrs.current.size === 1) {
+      // 1本 → ドラッグ開始（ズーム>1のみ）
+      if (zoom.current > 1) {
+        setDragging(true);
+        dragStart.current = { x: e.clientX, y: e.clientY };
+      }
+      pinchBase.current = null;
+    } else if (ptrs.current.size >= 2) {
+      // 2本 → ピンチ準備
+      const [p1, p2] = Array.from(ptrs.current.values()).slice(0, 2);
+      const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      const c = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+      pinchBase.current = { d, c };
+      setDragging(false); // 競合回避
     }
   }, []);
 
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent<SVGSVGElement>, svgRef: SVGSVGElement) => {
-      console.log(e.touches.length);
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent<SVGSVGElement>, svg: SVGSVGElement) => {
+      if (!ptrs.current.has(e.pointerId)) return;
+      ptrs.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-      if (e.touches.length === 1 && isDragging && zoom.current > 1) {
-        const dx = (dragStart.current.x - e.touches[0].clientX) / zoom.current;
-        const dy = (dragStart.current.y - e.touches[0].clientY) / zoom.current;
+      if (ptrs.current.size >= 2 && pinchBase.current && svg) {
+        // ピンチ
+        const [p1, p2] = Array.from(ptrs.current.values()).slice(0, 2);
+        const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        const c = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
 
-        targetPan.current = {
-          x: targetPan.current.x + dx,
-          y: targetPan.current.y + dy,
-        };
+        const scale = d / pinchBase.current.d;
+        if (scale !== 1) zoomAt(svg, c, scale);
+        pinchBase.current = { d, c }; // 次の基準
+        return;
+      }
 
-        dragStart.current = {
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY,
-        };
-
-        startAnimation();
-      } else if (e.touches.length === 2) {
-        setIsDragging(false);
-
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-        const distance = Math.hypot(
-          touch2.clientX - touch1.clientX,
-          touch2.clientY - touch1.clientY
-        );
-        const center = {
-          x: (touch1.clientX + touch2.clientX) / 2,
-          y: (touch1.clientY + touch2.clientY) / 2,
-        };
-
-        if (!lastTouchDistance.current || !lastTouchCenter.current) {
-          lastTouchDistance.current = distance;
-          lastTouchCenter.current = center;
-          return;
-        }
-
-        if (lastTouchDistance.current && lastTouchCenter.current) {
-          const scale = distance / lastTouchDistance.current;
-          const currentZoom = zoom.current;
-          const newZoom = Math.max(
-            MIN_ZOOM,
-            Math.min(MAX_ZOOM, currentZoom * scale)
-          );
-
-          const rect = svgRef.getBoundingClientRect();
-          const touchX = center.x - rect.left;
-          const touchY = center.y - rect.top;
-          const relX = touchX / rect.width;
-          const relY = touchY / rect.height;
-
-          const currentWidth = dimensions.width / currentZoom;
-          const currentHeight = dimensions.height / currentZoom;
-          const newWidth = dimensions.width / newZoom;
-          const newHeight = dimensions.height / newZoom;
-
-          const currentPan = pan.current;
-          const newPanX = currentPan.x + (currentWidth - newWidth) * relX;
-          const newPanY = currentPan.y + (currentHeight - newHeight) * relY;
-
-          targetZoom.current = newZoom;
-          targetPan.current = { x: newPanX, y: newPanY };
-
-          startAnimation();
-        }
-
-        lastTouchDistance.current = distance;
-        lastTouchCenter.current = center;
+      if (isDragging && zoom.current > 1) {
+        // ドラッグ
+        const prev = dragStart.current;
+        panBy(prev.x - e.clientX, prev.y - e.clientY);
+        dragStart.current = { x: e.clientX, y: e.clientY };
       }
     },
-    [isDragging, dimensions, startAnimation]
+    [isDragging, panBy, zoomAt]
   );
 
-  const handleTouchEnd = useCallback(() => {
-    setIsDragging(false);
-    lastTouchDistance.current = null;
-    lastTouchCenter.current = null;
+  const onPointerUp = useCallback((e: React.PointerEvent<SVGSVGElement>) => {
+    ptrs.current.delete(e.pointerId);
+    if (ptrs.current.size < 2) pinchBase.current = null;
+    if (ptrs.current.size === 0) setDragging(false);
   }, []);
 
+  // 追加: setOffset 実装（スクリーンpx → viewBox座標で補正）
   const setOffset = useCallback(
-    (newOffset: { x: number; y: number }) => {
-      const currentOffset = offset.current;
-      const currentPan = targetPan.current;
-      const currentZoom = zoom.current;
+    (newOffset: XY) => {
+      const curr = zoom.current; // いまの表示ズーム
+      const old = offset.current; // 直前のオフセット(スクリーンpx)
 
-      // スクリーン座標系のオフセットをviewBox座標系に変換
-      const viewBoxOffsetX = newOffset.x / currentZoom;
-      const viewBoxOffsetY = newOffset.y / currentZoom;
-      const currentViewBoxOffsetX = currentOffset.x / currentZoom;
-      const currentViewBoxOffsetY = currentOffset.y / currentZoom;
+      // スクリーン → viewBox 変換（ズームで割る）
+      const oldVb = { x: old.x / curr, y: old.y / curr };
+      const newVb = { x: newOffset.x / curr, y: newOffset.y / curr };
 
-      // 現在のオフセットを引いて新しいオフセットを足す
-      targetPan.current = {
-        x: currentPan.x - currentViewBoxOffsetX + viewBoxOffsetX,
-        y: currentPan.y - currentViewBoxOffsetY + viewBoxOffsetY,
+      // いったん旧オフセットを打ち消し、新オフセットを加える
+      pT.current = {
+        x: pT.current.x - oldVb.x + newVb.x,
+        y: pT.current.y - oldVb.y + newVb.y,
       };
 
       offset.current = newOffset;
-      startAnimation();
+      schedule();
     },
-    [startAnimation]
+    [schedule]
   );
 
+  /** 公開 API */
   return {
     zoom,
     pan,
     isDragging,
     handleWheel,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
     setOffset,
   };
 }
