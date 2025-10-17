@@ -80,7 +80,7 @@ export const PrefectureCard = memo(function PrefectureCard({
       )}
 
       {/* 左下：Detail ボタンと矢印 */}
-      <div className="hidden sm:flex absolute bottom-2 xl:bottom-4 left-2 xl:left-4items-center gap-1 xl:gap-2">
+      <div className="hidden sm:flex absolute bottom-2 xl:bottom-4 left-2 xl:left-4 items-center gap-1 xl:gap-2">
         <span className="text-[9px] xl:text-xs font-bold text-base-color-700">
           Compare
         </span>
