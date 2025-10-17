@@ -17,10 +17,10 @@ export function PopulationLegend({
   };
 
   return (
-    <div className="flex items-center gap-3 bg-white/92 backdrop-blur-md px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
-      <span className="text-xs text-slate-600 font-medium">人口</span>
+    <div className="flex items-center gap-3 bg-white/92 backdrop-blur-md px-4 py-2 rounded-lg border border-base-color-200 shadow-sm">
+      <span className="text-xs text-base-color-600 font-medium">人口</span>
       <div className="flex items-center gap-2">
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-base-color-500">
           {formatPopulation(minPopulation)}
         </span>
         <div className="flex h-4 w-32 rounded-sm overflow-hidden">
@@ -38,7 +38,7 @@ export function PopulationLegend({
             );
           })}
         </div>
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-base-color-500">
           {formatPopulation(maxPopulation)}
         </span>
       </div>

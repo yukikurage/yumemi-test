@@ -19,7 +19,7 @@ export function DesktopGraphPanel({
 }: DesktopGraphPanelProps) {
   return (
     <div
-      className="hidden xl:block absolute right-4 top-4 rounded-md bg-white p-6 border border-slate-200 transition-opacity duration-500 overflow-auto w-2xl 2xl:w-3xl"
+      className="hidden xl:block absolute right-4 top-4 rounded-md bg-white p-6 border border-base-color-200 transition-opacity duration-500 overflow-auto w-2xl 2xl:w-3xl"
       style={{
         opacity: hasSelection ? 1 : 0,
         pointerEvents: hasSelection ? "auto" : "none",

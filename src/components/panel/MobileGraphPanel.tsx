@@ -28,7 +28,7 @@ export function MobileGraphPanel({
 
   return (
     <div
-      className="overflow-hidden xl:hidden fixed left-0 right-0 border-t bottom-0 border-slate-200 shadow-lg z-10 transition-all duration-300 rounded-t-4xl flex flex-col"
+      className="overflow-hidden xl:hidden fixed left-0 right-0 border-t bottom-0 border-base-color-200 shadow-lg z-10 transition-all duration-300 rounded-t-4xl flex flex-col"
       style={{
         bottom: 0,
         top:
@@ -46,7 +46,7 @@ export function MobileGraphPanel({
               setMobileGraphState("hidden");
             }
           }}
-          className="w-full py-3 border-b border-slate-200 bg-white/92 backdrop-blur-md text-xs text-slate-500 flex justify-center items-center cursor-pointer"
+          className="w-full py-3 border-b border-base-color-200 bg-white/92 backdrop-blur-md text-xs text-base-color-500 flex justify-center items-center cursor-pointer"
           aria-label={
             mobileGraphState === "compact" ? "詳細を展開" : "詳細を閉じる"
           }

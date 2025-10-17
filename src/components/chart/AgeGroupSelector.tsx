@@ -17,7 +17,7 @@ export function AgeGroupSelector({
   onChange,
 }: AgeGroupSelectorProps) {
   return (
-    <div className="w-full xl:w-fit flex rounded-full border border-slate-200 bg-white/92 backdrop-blur-md">
+    <div className="w-full xl:w-fit flex rounded-full border border-base-color-200 bg-white/92 backdrop-blur-md">
       {AGE_GROUPS.map((group) => (
         <button
           key={group.value}
@@ -26,8 +26,8 @@ export function AgeGroupSelector({
             border-2 min-w-28 xl:min-w-32 h-8 text-sm font-medium transition-all cursor-pointer grow rounded-full
             ${
               selected === group.value
-                ? "text-cyan-900 font-bold shadow-sm bg-primary-background border-primary-border "
-                : "text-slate-600 hover:text-slate-900 border-transparent"
+                ? "text-primary-text font-bold shadow-sm bg-primary-background border-primary-border "
+                : "text-base-color-600 hover:text-base-color-900 border-transparent"
             }
           `}
         >

@@ -7,10 +7,10 @@ type ZoomIndicatorProps = {
 export function ZoomIndicator({ indicatorRef }: ZoomIndicatorProps) {
   return (
     <div className="absolute left-4 top-4 flex flex-col items-center gap-2">
-      <div className="relative h-64 w-1 bg-slate-300 rounded-full">
+      <div className="relative h-64 w-1 bg-base-color-300 rounded-full">
         <div
           ref={indicatorRef}
-          className="absolute w-4 h-4 bg-slate-400 rounded-full -left-1.5"
+          className="absolute w-4 h-4 bg-base-color-400 rounded-full -left-1.5"
           style={{
             transform: "translateY(-50%)",
           }}

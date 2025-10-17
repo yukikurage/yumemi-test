@@ -32,9 +32,9 @@ export const MapPrefecturePath = memo(function MapPrefecturePath({
     <path
       key={`prefecture-${index}`}
       d={pathData || undefined}
-      className="prefecture cursor-pointer transition-all duration-200 hover:opacity-50"
+      className="prefecture cursor-pointer transition-all duration-200 hover:opacity-70"
       fill={fillColor}
-      stroke="#ffffff"
+      stroke="var(--base-color-100)"
       strokeWidth={1}
       vectorEffect="non-scaling-stroke"
       onClick={() => onPrefectureClick(prefName)}

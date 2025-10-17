@@ -1,7 +1,7 @@
 export function Header() {
   return (
-    <header className="w-full h-16 xl:h-20 bg-white/92 backdrop-blur-md border-b border-slate-200 flex items-center justify-start xl:justify-center px-4 xl:px-8 relative z-10">
-      <div className="flex items-end justify-start xl:justify-center gap-1">
+    <header className="w-full h-16 xl:h-20 bg-white/92 backdrop-blur-md border-b border-base-color-200 flex items-center justify-start xl:justify-center px-4 xl:px-8 relative z-10">
+      <div className="flex items-end justify-start xl:justify-center gap-1 select-none">
         <h1 className="text-xl xl:text-2xl font-bold leading-none font-montserrat">
           POPULATIONS
         </h1>
@@ -17,7 +17,7 @@ export function Header() {
           href="https://github.com/yukikurage/yumemi-test"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-slate-700 hover:text-slate-900 transition-colors"
+          className="flex items-center gap-2 text-base-color-700 hover:text-base-color-900 transition-colors"
           aria-label="View source on GitHub"
         >
           <svg

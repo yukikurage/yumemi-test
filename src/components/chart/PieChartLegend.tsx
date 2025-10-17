@@ -6,14 +6,14 @@ export function PieChartLegend() {
   ];
 
   return (
-    <div className="flex items-center gap-4 bg-white/92 backdrop-blur-md px-4 py-2 rounded-lg border border-slate-200 ">
+    <div className="flex items-center gap-4 bg-white/92 backdrop-blur-md px-4 py-2 rounded-lg border border-base-color-200 ">
       {legendItems.map((item) => (
         <div key={item.label} className="flex items-center gap-2">
           <div
             className="w-3 h-3 rounded-sm"
             style={{ backgroundColor: item.color }}
           />
-          <span className="text-xs text-slate-700 font-medium">
+          <span className="text-xs text-base-color-700 font-medium">
             {item.label}
           </span>
         </div>

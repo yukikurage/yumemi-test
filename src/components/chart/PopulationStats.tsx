@@ -12,11 +12,11 @@ export function PopulationStats({
   return (
     <div className="flex gap-6 text-sm">
       <div>
-        <span className="text-slate-600">選択中:</span>{" "}
+        <span className="text-base-color-600">選択中:</span>{" "}
         <span className="font-semibold">{selectedCount}件</span>
       </div>
       <div>
-        <span className="text-slate-600">合計人口:</span>{" "}
+        <span className="text-base-color-600">合計人口:</span>{" "}
         <span className="font-semibold">{formattedPopulation}人</span>
       </div>
     </div>

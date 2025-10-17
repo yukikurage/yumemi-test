@@ -53,9 +53,9 @@ export function PopulationTable({
     .filter(Boolean);
 
   return (
-    <div className="overflow-auto max-h-96 border rounded-md border-slate-200">
+    <div className="overflow-auto max-h-96 border rounded-md border-base-color-200">
       <table className="w-full text-sm min-w-max">
-        <thead className="bg-slate-50 sticky top-0 font-mediu text-slate-700">
+        <thead className="bg-base-color-50 sticky top-0 font-mediu text-base-color-700">
           <tr>
             <th className="px-4 py-2 text-left whitespace-nowrap">都道府県</th>
             <th className="px-4 py-2 text-right whitespace-nowrap">
@@ -63,13 +63,13 @@ export function PopulationTable({
             </th>
             <th className="px-4 py-2 text-right whitespace-nowrap">年少</th>
             <th className="px-4 py-2 text-right whitespace-nowrap">生産年齢</th>
-            <th className="px-4 py-2 text-right text-slate-700 whitespace-nowrap">
+            <th className="px-4 py-2 text-right text-base-color-700 whitespace-nowrap">
               老年
             </th>
-            <th className="px-4 py-2 text-right text-slate-700 whitespace-nowrap">
+            <th className="px-4 py-2 text-right text-base-color-700 whitespace-nowrap">
               1960年
             </th>
-            <th className="px-4 py-2 text-right text-slate-700 whitespace-nowrap">
+            <th className="px-4 py-2 text-right text-base-color-700 whitespace-nowrap">
               増加率
             </th>
           </tr>
@@ -80,7 +80,7 @@ export function PopulationTable({
             return (
               <tr
                 key={row.prefecture.prefCode}
-                className="border-t border-slate-200 hover:bg-slate-50"
+                className="border-t border-base-color-200 hover:bg-base-color-50"
               >
                 <td className="px-4 py-2 whitespace-nowrap">
                   {row.prefecture.prefName}

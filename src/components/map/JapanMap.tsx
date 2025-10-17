@@ -7,10 +7,6 @@ import { usePopulationColorMap } from "@/hooks/usePopulationColorMap";
 import { useMapZoom } from "@/hooks/useMapZoom";
 import { useMapData } from "@/hooks/useMapData";
 import { MapPrefecturePath } from "@/components/map/MapPrefecturePath";
-import {
-  AgeGroupSelector,
-  type AgeGroup,
-} from "@/components/chart/AgeGroupSelector";
 
 type Prefecture = components["schemas"]["Prefecture"];
 
@@ -42,7 +38,6 @@ export const JapanMap = memo(function JapanMap({
 }: JapanMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 1600, height: 900 });
-  const [selectedAgeGroup, setSelectedAgeGroup] = useState<AgeGroup>("total");
 
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -113,10 +108,7 @@ export const JapanMap = memo(function JapanMap({
   }, [prefectures]);
 
   // カスタムフックで人口データから色を計算
-  const populationColorMap = usePopulationColorMap(
-    allPopulationData,
-    selectedAgeGroup
-  );
+  const populationColorMap = usePopulationColorMap(allPopulationData, "total");
 
   // グラフエリアが開いたときに地図をずらす
   useEffect(() => {

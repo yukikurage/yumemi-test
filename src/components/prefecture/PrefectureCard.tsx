@@ -44,22 +44,22 @@ export const PrefectureCard = memo(function PrefectureCard({
       className={`relative backdrop-blur-md w-32 xl:w-64 h-20 xl:h-36 shrink-0 p-2 xl:p-4 cursor-pointer hover:shadow-lg active:shadow-md transition-all rounded-md outline ${
         checked
           ? "outline-2 outline-primary-border bg-primary-background/92"
-          : "outline-slate-200 bg-white/92"
+          : "outline-base-color-200 bg-white/92"
       }`}
       onClick={() => onChange(!checked)}
     >
       {/* 左上：都道府県名と英語名 */}
       <div className="absolute top-2 xl:top-4 left-2 xl:left-4 text-left">
         <div
-          className={`text-sm xl:text-base font-normal ${checked ? "text-cyan-900 font-bold" : "text-slate-900"}`}
+          className={`text-sm xl:text-base font-normal ${checked ? "text-primary-text font-bold" : "text-base-color-900"}`}
         >
           {pref.prefName}
         </div>
-        <div className="text-xs xl:text-sm font-normal text-slate-700 hidden xl:block">
+        <div className="text-xs xl:text-sm font-normal text-base-color-700 hidden xl:block">
           {englishName}
         </div>
         {totalPopulation && (
-          <div className="text-[10px] xl:text-xs font-medium text-slate-600 mt-0.5 xl:mt-1">
+          <div className="text-[10px] xl:text-xs font-medium text-base-color-600 mt-0.5 xl:mt-1">
             {formatPopulation(totalPopulation)}
           </div>
         )}
@@ -79,11 +79,11 @@ export const PrefectureCard = memo(function PrefectureCard({
 
       {/* 左下：Detail ボタンと矢印 */}
       <div className="absolute bottom-2 xl:bottom-4 left-2 xl:left-4 flex items-center gap-1 xl:gap-2">
-        <span className="text-[9px] xl:text-xs font-bold text-slate-700">
+        <span className="text-[9px] xl:text-xs font-bold text-base-color-700">
           Compare
         </span>
         <svg
-          className="w-3 h-3 text-slate-700"
+          className="w-3 h-3 text-base-color-700"
           fill="none"
           strokeWidth={2}
           stroke="currentColor"
