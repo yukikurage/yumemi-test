@@ -117,7 +117,7 @@ export function useMapZoom(
       }
       pinchBase.current = null;
     } else if (ptrs.current.size >= 2) {
-      // 2本 → ピンチ準備
+      // 2本
       const [p1, p2] = Array.from(ptrs.current.values()).slice(0, 2);
       const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
       const c = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
@@ -132,25 +132,45 @@ export function useMapZoom(
       ptrs.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
       if (ptrs.current.size >= 2 && pinchBase.current && svg) {
-        // ピンチ
         const [p1, p2] = Array.from(ptrs.current.values()).slice(0, 2);
         const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-        const c = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
 
-        const scale = d / pinchBase.current.d;
-        if (scale !== 1) zoomAt(svg, c, scale);
-        pinchBase.current = { d, c }; // 次の基準
+        const base = pinchBase.current;
+        const totalScale = d / base.d; // ← ピンチ開始からの総距離比
+        const adjusted = Math.pow(totalScale, 1.1);
+
+        const currentZoom = zoom.current;
+        const nextZoom = Math.max(
+          MIN_ZOOM,
+          Math.min(MAX_ZOOM, currentZoom * adjusted)
+        );
+
+        const rect = svg.getBoundingClientRect();
+        const relX = (base.c.x - rect.left) / rect.width;
+        const relY = (base.c.y - rect.top) / rect.height;
+
+        const currentWidth = dimensions.width / currentZoom;
+        const currentHeight = dimensions.height / currentZoom;
+        const newWidth = dimensions.width / nextZoom;
+        const newHeight = dimensions.height / nextZoom;
+
+        const { x, y } = pan.current;
+        const newPanX = x + (currentWidth - newWidth) * relX;
+        const newPanY = y + (currentHeight - newHeight) * relY;
+
+        zoom.current = zT.current = nextZoom;
+        pan.current = pT.current = { x: newPanX, y: newPanY };
+        updateViewBox(nextZoom, { x: newPanX, y: newPanY });
         return;
       }
 
       if (isDragging && zoom.current > 1) {
-        // ドラッグ
         const prev = dragStart.current;
         panBy(prev.x - e.clientX, prev.y - e.clientY);
         dragStart.current = { x: e.clientX, y: e.clientY };
       }
     },
-    [isDragging, panBy, zoomAt]
+    [isDragging, panBy, updateViewBox, dimensions]
   );
 
   const onPointerUp = useCallback((e: React.PointerEvent<SVGSVGElement>) => {
