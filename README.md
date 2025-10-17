@@ -118,7 +118,9 @@ src/
 ├── types/                # TypeScript types
 │   └── population.ts     # Population data types
 └── generated/            # Auto-generated files
-│   └── api.ts            # API types from OpenAPI spec
+　   └── api.ts            # API types from OpenAPI spec
+workers/
+└── cache-warmer/         # Cache warming worker
 ```
 
 ## Scripts

@@ -53,8 +53,6 @@ export function useMapZoom(
 
   const handleWheel = useCallback(
     (e: React.WheelEvent<SVGSVGElement>, svgRef: SVGSVGElement) => {
-      e.preventDefault();
-
       const delta = e.deltaY > 0 ? 0.8 : 1.2;
       const currentZoom = zoom.current;
       const newZoom = Math.max(
@@ -88,7 +86,6 @@ export function useMapZoom(
 
   const handleMouseDown = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
     if (zoom.current <= 1) return;
-    e.preventDefault();
     setIsDragging(true);
     dragStart.current = { x: e.clientX, y: e.clientY };
   }, []);
@@ -96,10 +93,8 @@ export function useMapZoom(
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
       if (!isDragging || zoom.current <= 1) return;
-      e.preventDefault();
-
-      const dx = (dragStart.current.x - e.clientX) / targetZoom.current;
-      const dy = (dragStart.current.y - e.clientY) / targetZoom.current;
+      const dx = (dragStart.current.x - e.clientX) / zoom.current;
+      const dy = (dragStart.current.y - e.clientY) / zoom.current;
 
       targetPan.current = {
         x: targetPan.current.x + dx,
@@ -141,13 +136,11 @@ export function useMapZoom(
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent<SVGSVGElement>, svgRef: SVGSVGElement) => {
-      e.preventDefault();
+      console.log(e.touches.length);
 
       if (e.touches.length === 1 && isDragging && zoom.current > 1) {
-        const dx =
-          (dragStart.current.x - e.touches[0].clientX) / targetZoom.current;
-        const dy =
-          (dragStart.current.y - e.touches[0].clientY) / targetZoom.current;
+        const dx = (dragStart.current.x - e.touches[0].clientX) / zoom.current;
+        const dy = (dragStart.current.y - e.touches[0].clientY) / zoom.current;
 
         targetPan.current = {
           x: targetPan.current.x + dx,
@@ -161,6 +154,8 @@ export function useMapZoom(
 
         startAnimation();
       } else if (e.touches.length === 2) {
+        setIsDragging(false);
+
         const touch1 = e.touches[0];
         const touch2 = e.touches[1];
         const distance = Math.hypot(
@@ -172,6 +167,12 @@ export function useMapZoom(
           y: (touch1.clientY + touch2.clientY) / 2,
         };
 
+        if (!lastTouchDistance.current || !lastTouchCenter.current) {
+          lastTouchDistance.current = distance;
+          lastTouchCenter.current = center;
+          return;
+        }
+
         if (lastTouchDistance.current && lastTouchCenter.current) {
           const scale = distance / lastTouchDistance.current;
           const currentZoom = zoom.current;
@@ -181,8 +182,10 @@ export function useMapZoom(
           );
 
           const rect = svgRef.getBoundingClientRect();
-          const relX = center.x / rect.width;
-          const relY = center.y / rect.height;
+          const touchX = center.x - rect.left;
+          const touchY = center.y - rect.top;
+          const relX = touchX / rect.width;
+          const relY = touchY / rect.height;
 
           const currentWidth = dimensions.width / currentZoom;
           const currentHeight = dimensions.height / currentZoom;

@@ -191,6 +191,7 @@ export const JapanMap = memo(function JapanMap({
     <div
       ref={containerRef}
       className="w-full h-full flex items-center justify-center text-primary relative overflow-hidden"
+      style={{ touchAction: "none" }}
     >
       {/* 色の凡例 */}
       <ColorLegend

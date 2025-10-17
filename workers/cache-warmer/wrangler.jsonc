@@ -7,8 +7,8 @@
   ],
   "triggers": {
     "crons": [
-      // 毎日午前3時（JST）に実行 = UTC 18:00
-      "0 18 * * *"
+      // 毎週月曜午前3時（JST）に実行 = UTC 日曜 18:00
+      "0 18 * * SUN"
     ]
   },
   "kv_namespaces": [

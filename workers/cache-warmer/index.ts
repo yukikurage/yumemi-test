@@ -20,9 +20,9 @@ async function fetchAndCachePopulation(
 
     const data = await response.json();
 
-    // 7日間キャッシュ（データは年次なので長期でOK）
+    // 30日間キャッシュ（データは年次なので長期でOK）
     await env.POPULATION_CACHE.put(cacheKey, JSON.stringify(data), {
-      expirationTtl: 604800,
+      expirationTtl: 2592000, // 30 days
     });
 
     console.log(`✓ Cached prefCode ${prefCode}`);
