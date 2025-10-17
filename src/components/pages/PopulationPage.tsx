@@ -3,10 +3,10 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import type { components } from "@/generated/api";
 import { searchPrefectures } from "@/lib/searchPrefectures";
-import { JapanMap } from "./JapanMap";
-import { DesktopGraphPanel } from "./DesktopGraphPanel";
-import { MobileGraphPanel } from "./MobileGraphPanel";
-import { PrefectureSelectionPanel } from "./PrefectureSelectionPanel";
+import { JapanMap } from "@/components/map/JapanMap";
+import { DesktopGraphPanel } from "@/components/panel/DesktopGraphPanel";
+import { MobileGraphPanel } from "@/components/panel/MobileGraphPanel";
+import { PrefectureSelectionPanel } from "@/components/prefecture/PrefectureSelectionPanel";
 
 type Prefecture = components["schemas"]["Prefecture"];
 
@@ -122,6 +122,8 @@ export function PopulationPage({
           selectedPrefCodes={selectedPrefs}
           onPrefectureClick={handleMapClick}
           allPopulationData={allPopulationData}
+          hasSelection={hasSelection}
+          mobileGraphState={mobileGraphState}
         />
       </div>
 

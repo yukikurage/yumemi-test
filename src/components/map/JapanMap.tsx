@@ -6,7 +6,11 @@ import { useMapProjections } from "@/hooks/useMapProjections";
 import { usePopulationColorMap } from "@/hooks/usePopulationColorMap";
 import { useMapZoom } from "@/hooks/useMapZoom";
 import { useMapData } from "@/hooks/useMapData";
-import { MapPrefecturePath } from "./MapPrefecturePath";
+import { MapPrefecturePath } from "@/components/map/MapPrefecturePath";
+import {
+  AgeGroupSelector,
+  type AgeGroup,
+} from "@/components/chart/AgeGroupSelector";
 
 type Prefecture = components["schemas"]["Prefecture"];
 
@@ -24,6 +28,8 @@ type JapanMapProps = {
   selectedPrefCodes: Set<number>;
   onPrefectureClick: (prefCode: number) => void;
   allPopulationData: AllPopulationData[];
+  hasSelection: boolean;
+  mobileGraphState: "hidden" | "compact" | "expanded";
 };
 
 export const JapanMap = memo(function JapanMap({
@@ -31,9 +37,12 @@ export const JapanMap = memo(function JapanMap({
   selectedPrefCodes,
   onPrefectureClick,
   allPopulationData,
+  hasSelection,
+  mobileGraphState,
 }: JapanMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 1600, height: 900 });
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState<AgeGroup>("total");
 
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -87,6 +96,7 @@ export const JapanMap = memo(function JapanMap({
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
+    setOffset,
   } = useMapZoom(dimensions, updateViewBox);
 
   // カスタムフックで投影設定を取得
@@ -103,7 +113,28 @@ export const JapanMap = memo(function JapanMap({
   }, [prefectures]);
 
   // カスタムフックで人口データから色を計算
-  const populationColorMap = usePopulationColorMap(allPopulationData);
+  const populationColorMap = usePopulationColorMap(
+    allPopulationData,
+    selectedAgeGroup
+  );
+
+  // グラフエリアが開いたときに地図をずらす
+  useEffect(() => {
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+
+    // デスクトップ: グラフが表示されたら左にずらす（固定ピクセル）
+    if (hasSelection && isDesktop) {
+      setOffset({ x: 150, y: 0 }); // 150px左にずらす
+    }
+    // モバイル: グラフが表示されたら上にずらす（固定ピクセル）
+    else if (mobileGraphState !== "hidden" && !isDesktop) {
+      setOffset({ x: 0, y: 100 }); // 100px上にずらす
+    }
+    // グラフが非表示になったらオフセットを解除
+    else {
+      setOffset({ x: 0, y: 0 });
+    }
+  }, [hasSelection, mobileGraphState, setOffset]);
 
   const handlePrefectureClick = (prefName: string) => {
     const prefCode = nameToCodeMap.get(prefName);

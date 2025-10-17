@@ -2,7 +2,7 @@
 
 import { components } from "@/generated/api";
 import { getPrefectureEnglishName } from "@/lib/prefectureExtraData";
-import { PopulationPieChart } from "./PopulationPieChart";
+import { PopulationPieChart } from "@/components/chart/PopulationPieChart";
 import { memo } from "react";
 
 type Prefecture = components["schemas"]["Prefecture"];
@@ -41,16 +41,18 @@ export const PrefectureCard = memo(function PrefectureCard({
 
   return (
     <button
-      className={`relative backdrop-blur-md w-32 xl:w-64 h-20 xl:h-36 shrink-0 p-2 xl:p-4 cursor-pointer hover:shadow-lg active:shadow-md transition-all rounded-md border ${
+      className={`relative backdrop-blur-md w-32 xl:w-64 h-20 xl:h-36 shrink-0 p-2 xl:p-4 cursor-pointer hover:shadow-lg active:shadow-md transition-all rounded-md outline ${
         checked
-          ? "border-primary-border bg-primary-background/92"
-          : "border-slate-200 bg-white/92"
+          ? "outline-2 outline-primary-border bg-primary-background/92"
+          : "outline-slate-200 bg-white/92"
       }`}
       onClick={() => onChange(!checked)}
     >
       {/* 左上：都道府県名と英語名 */}
       <div className="absolute top-2 xl:top-4 left-2 xl:left-4 text-left">
-        <div className="text-sm xl:text-base font-normal text-slate-900">
+        <div
+          className={`text-sm xl:text-base font-normal ${checked ? "text-cyan-900 font-bold" : "text-slate-900"}`}
+        >
           {pref.prefName}
         </div>
         <div className="text-xs xl:text-sm font-normal text-slate-700 hidden xl:block">

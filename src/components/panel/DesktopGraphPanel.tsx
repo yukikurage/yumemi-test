@@ -1,6 +1,6 @@
 import type { components } from "@/generated/api";
-import { PopulationChart } from "./PopulationChart";
-import type { AllPopulationData } from "./PopulationPage";
+import { PopulationChart } from "@/components/chart/PopulationChart";
+import type { AllPopulationData } from "@/components/pages/PopulationPage";
 
 type Prefecture = components["schemas"]["Prefecture"];
 
@@ -19,7 +19,7 @@ export function DesktopGraphPanel({
 }: DesktopGraphPanelProps) {
   return (
     <div
-      className="hidden lg:block absolute right-4 top-4 rounded-md bg-white/90 backdrop-blur-sm p-8 border border-neutral-200 max-w-2xl transition-opacity duration-500 overflow-auto"
+      className="hidden xl:block absolute right-4 top-4 rounded-md bg-white p-6 border border-slate-200 transition-opacity duration-500 overflow-auto w-2xl 2xl:w-3xl"
       style={{
         opacity: hasSelection ? 1 : 0,
         pointerEvents: hasSelection ? "auto" : "none",

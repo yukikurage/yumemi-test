@@ -11,7 +11,7 @@ export function useMapProjections(dimensions: {
     return geoMercator()
       .center([135, 39])
       .scale(baseScale)
-      .translate([dimensions.width * 0.45, dimensions.height * 0.42]);
+      .translate([dimensions.width * 0.44, dimensions.height * 0.43]);
   }, [dimensions.width, dimensions.height]);
 
   // 沖縄用の投影設定（左上に表示、アスペクト比に応じて位置調整）
@@ -26,13 +26,10 @@ export function useMapProjections(dimensions: {
     // 線形補間でスムーズに変化
     const minAspect = 0.7;
     const maxAspect = 1.5;
-    const minXRatio = 0.15;
+    const minXRatio = 0.1;
     const maxXRatio = 0.3;
 
-    const clampedAspect = Math.max(
-      minAspect,
-      Math.min(maxAspect, aspectRatio)
-    );
+    const clampedAspect = Math.max(minAspect, Math.min(maxAspect, aspectRatio));
     const xRatio =
       minXRatio +
       ((clampedAspect - minAspect) / (maxAspect - minAspect)) *

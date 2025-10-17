@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #bc002d;
-  --primary-border: #d85472;
-  --primary-background: #fff3f5;
+  --primary: #1378dd;
+  --primary-border: #0a5eb3;
+  --primary-background: #dbecff;
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -22,9 +22,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --primary: #bc002d;
-    --primary-border: #bc002d;
-    --primary-background: #dfa6b2;
+    --primary: #1378dd;
+    --primary-border: #2588eb;
+    --primary-background: #001224;
     --background: #0a0a0a;
     --foreground: #ededed;
   }

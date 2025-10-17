@@ -13,11 +13,11 @@ import {
 import { memo, useMemo, useState, useCallback } from "react";
 import type { components } from "@/generated/api";
 import { getRandomColorFromNumber } from "@/lib/getRandomColorFromNumber";
-import { PrefectureChip } from "./PrefectureChip";
-import { AgeGroupSelector, type AgeGroup } from "./AgeGroupSelector";
-import { PopulationStats } from "./PopulationStats";
-import { PopulationTable } from "./PopulationTable";
-import type { AllPopulationData } from "./PopulationPage";
+import { PrefectureChip } from "@/components/prefecture/PrefectureChip";
+import { AgeGroupSelector, type AgeGroup } from "@/components/chart/AgeGroupSelector";
+import { PopulationStats } from "@/components/chart/PopulationStats";
+import { PopulationTable } from "@/components/chart/PopulationTable";
+import type { AllPopulationData } from "@/components/pages/PopulationPage";
 
 type Prefecture = components["schemas"]["Prefecture"];
 

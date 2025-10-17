@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { PrefectureChip } from "../PrefectureChip";
+import { PrefectureChip } from "@/components/prefecture/PrefectureChip";
 
 describe("PrefectureChip", () => {
   const mockPrefecture = {

@@ -33,7 +33,7 @@ export function RegionFilter({ selectedRegion, onChange }: RegionFilterProps) {
       <select
         value={selectedRegion}
         onChange={(e) => onChange(e.target.value as Region)}
-        className="h-10 px-3 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+        className="h-10 px-3 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
       >
         {REGIONS.map((region) => (
           <option key={region.value} value={region.value}>

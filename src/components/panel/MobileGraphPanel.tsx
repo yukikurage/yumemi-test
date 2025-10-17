@@ -1,7 +1,7 @@
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import type { components } from "@/generated/api";
-import { PopulationChart } from "./PopulationChart";
-import type { AllPopulationData } from "./PopulationPage";
+import { PopulationChart } from "@/components/chart/PopulationChart";
+import type { AllPopulationData } from "@/components/pages/PopulationPage";
 
 type Prefecture = components["schemas"]["Prefecture"];
 

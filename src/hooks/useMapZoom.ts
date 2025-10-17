@@ -11,6 +11,7 @@ export function useMapZoom(
   const pan = useRef({ x: 0, y: 0 });
   const targetZoom = useRef(1);
   const targetPan = useRef({ x: 0, y: 0 });
+  const offset = useRef({ x: 0, y: 0 }); // グラフによるオフセット
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const animationFrame = useRef<number | null>(null);
@@ -55,7 +56,7 @@ export function useMapZoom(
       e.preventDefault();
 
       const delta = e.deltaY > 0 ? 0.8 : 1.2;
-      const currentZoom = targetZoom.current;
+      const currentZoom = zoom.current;
       const newZoom = Math.max(
         MIN_ZOOM,
         Math.min(MAX_ZOOM, currentZoom * delta)
@@ -73,7 +74,7 @@ export function useMapZoom(
       const newWidth = dimensions.width / newZoom;
       const newHeight = dimensions.height / newZoom;
 
-      const currentPan = targetPan.current;
+      const currentPan = pan.current;
       const newPanX = currentPan.x + (currentWidth - newWidth) * relX;
       const newPanY = currentPan.y + (currentHeight - newHeight) * relY;
 
@@ -173,7 +174,7 @@ export function useMapZoom(
 
         if (lastTouchDistance.current && lastTouchCenter.current) {
           const scale = distance / lastTouchDistance.current;
-          const currentZoom = targetZoom.current;
+          const currentZoom = zoom.current;
           const newZoom = Math.max(
             MIN_ZOOM,
             Math.min(MAX_ZOOM, currentZoom * scale)
@@ -188,7 +189,7 @@ export function useMapZoom(
           const newWidth = dimensions.width / newZoom;
           const newHeight = dimensions.height / newZoom;
 
-          const currentPan = targetPan.current;
+          const currentPan = pan.current;
           const newPanX = currentPan.x + (currentWidth - newWidth) * relX;
           const newPanY = currentPan.y + (currentHeight - newHeight) * relY;
 
@@ -211,6 +212,30 @@ export function useMapZoom(
     lastTouchCenter.current = null;
   }, []);
 
+  const setOffset = useCallback(
+    (newOffset: { x: number; y: number }) => {
+      const currentOffset = offset.current;
+      const currentPan = targetPan.current;
+      const currentZoom = zoom.current;
+
+      // スクリーン座標系のオフセットをviewBox座標系に変換
+      const viewBoxOffsetX = newOffset.x / currentZoom;
+      const viewBoxOffsetY = newOffset.y / currentZoom;
+      const currentViewBoxOffsetX = currentOffset.x / currentZoom;
+      const currentViewBoxOffsetY = currentOffset.y / currentZoom;
+
+      // 現在のオフセットを引いて新しいオフセットを足す
+      targetPan.current = {
+        x: currentPan.x - currentViewBoxOffsetX + viewBoxOffsetX,
+        y: currentPan.y - currentViewBoxOffsetY + viewBoxOffsetY,
+      };
+
+      offset.current = newOffset;
+      startAnimation();
+    },
+    [startAnimation]
+  );
+
   return {
     zoom,
     pan,
@@ -222,5 +247,6 @@ export function useMapZoom(
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
+    setOffset,
   };
 }

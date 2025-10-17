@@ -1,8 +1,8 @@
 "use client";
 
 import { components } from "@/generated/api";
-import { PrefectureCard } from "./PrefectureCard";
-import type { AllPopulationData } from "./PopulationPage";
+import { PrefectureCard } from "@/components/prefecture/PrefectureCard";
+import type { AllPopulationData } from "@/components/pages/PopulationPage";
 import { useMemo, memo, useCallback } from "react";
 
 type Prefecture = components["schemas"]["Prefecture"];
@@ -68,7 +68,7 @@ export const PrefectureSelection = memo(function PrefectureSelection({
   }, [allPopulationData]);
 
   return (
-    <div className="w-fit h-20 lg:h-36 overflow-visible flex items-end gap-2 lg:gap-4 flex-nowrap">
+    <div className="w-fit h-20 xl:h-36 overflow-visible flex items-end gap-2 xl:gap-4 flex-nowrap">
       {prefectures.map((pref) => {
         return (
           <PrefectureCard

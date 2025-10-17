@@ -1,6 +1,6 @@
 import { fetchPrefectures, fetchAllPopulationData } from "./actions";
-import { PopulationPage } from "@/components/PopulationPage";
-import { Header } from "@/components/Header";
+import { PopulationPage } from "@/components/pages/PopulationPage";
+import { Header } from "@/components/layout/Header";
 
 export default async function Home() {
   const prefectures = await fetchPrefectures();

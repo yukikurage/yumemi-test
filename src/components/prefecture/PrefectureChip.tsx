@@ -9,11 +9,11 @@ type PrefectureChipProps = {
 
 export function PrefectureChip({ prefecture, onRemove }: PrefectureChipProps) {
   return (
-    <div className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full shrink-0">
-      <span className="text-sm font-medium">{prefecture.prefName}</span>
+    <div className="inline-flex items-center gap-2 px-3 h-8 bg-white border border-slate-200 has-[button:hover]:opacity-80 transition-all rounded-full shrink-0">
+      <span className="text-sm">{prefecture.prefName}</span>
       <button
         onClick={onRemove}
-        className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-300 transition-colors"
+        className="w-6 h-6 flex items-center justify-center rounded-full transition-colors cursor-pointer"
         aria-label={`${prefecture.prefName}を削除`}
       >
         <svg

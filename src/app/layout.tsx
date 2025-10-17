@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const montserrat = Montserrat({
@@ -27,12 +27,13 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Populations / JP",
   description: "日本の都道府県別人口データの可視化",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({

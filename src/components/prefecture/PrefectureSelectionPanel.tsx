@@ -1,9 +1,9 @@
 import type { components } from "@/generated/api";
-import { SearchInput } from "./SearchInput";
-import { PrefectureSelection } from "./PrefectureSelection";
-import type { AllPopulationData } from "./PopulationPage";
+import { SearchInput } from "@/components/prefecture/SearchInput";
+import { PrefectureSelection } from "@/components/prefecture/PrefectureSelection";
+import type { AllPopulationData } from "@/components/pages/PopulationPage";
 import { useHorizontalScroll } from "@/hooks/useHorizontalScroll";
-import { PieChartLegend } from "./PieChartLegend";
+import { PieChartLegend } from "@/components/chart/PieChartLegend";
 
 type Prefecture = components["schemas"]["Prefecture"];
 
@@ -33,20 +33,22 @@ export function PrefectureSelectionPanel({
   return (
     <>
       <div
-        className="fixed left-0 right-0 bottom-[var(--mobile-bottom)] lg:bottom-0 top-[var(--mobile-top)] h-fit flex flex-col gap-3 items-start justify-end transition-all duration-300"
+        className="fixed left-0 right-0 bottom-[var(--mobile-bottom)] xl:bottom-0 top-[var(--mobile-top)] h-fit flex flex-col p-2 items-start justify-end transition-all duration-300"
         style={{
           "--mobile-bottom": mobileBottom ?? "16px",
           "--mobile-top": mobileTop ?? "auto",
         }}
       >
-        <div className="w-full lg:w-fit px-4 pt-4 h-fit">
-          <SearchInput value={searchQuery} onChange={setSearchQuery} />
-        </div>
-        <div className="justify-start lg:flex-none hidden lg:flex px-4">
-          <PieChartLegend />
+        <div className="w-full px-4 h-fit flex justify-between items-center">
+          <div className="max-w-96">
+            <SearchInput value={searchQuery} onChange={setSearchQuery} />
+          </div>
+          <div className="hidden xl:flex h-full justify-end items-center">
+            <PieChartLegend />
+          </div>
         </div>
         <div ref={scrollRef} className="w-full h-fit overflow-auto">
-          <div className="px-4 pb-4 h-fit w-fit">
+          <div className="px-4 py-4 h-fit w-fit">
             <PrefectureSelection
               prefectures={filteredPrefectures}
               allPopulationData={allPopulationData}
@@ -56,12 +58,12 @@ export function PrefectureSelectionPanel({
           </div>
         </div>
       </div>
-      {/* <div className="hidden lg:flex fixed left-0 right-0 bottom-0 h-fit flex-col gap-4 items-start justify-end">
-        <div className="w-full px-8 pt-4 h-fit flex flex-col lg:flex-row items-stretch lg:items-center gap-3 lg:gap-4">
-          <div className="min-w-full lg:min-w-fit lg:flex-none">
+      {/* <div className="hidden xl:flex fixed left-0 right-0 bottom-0 h-fit flex-col gap-4 items-start justify-end">
+        <div className="w-full px-8 pt-4 h-fit flex flex-col xl:flex-row items-stretch xl:items-center gap-3 xl:gap-4">
+          <div className="min-w-full xl:min-w-fit xl:flex-none">
             <SearchInput value={searchQuery} onChange={setSearchQuery} />
           </div>
-          <div className="flex justify-start lg:flex-none">
+          <div className="flex justify-start xl:flex-none">
             <PieChartLegend />
           </div>
         </div>

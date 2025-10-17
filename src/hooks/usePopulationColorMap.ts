@@ -9,15 +9,39 @@ type AllPopulationData = {
   elderlyPopulation: { year: number; value: number; rate?: number }[];
 };
 
-export function usePopulationColorMap(allPopulationData: AllPopulationData[]) {
+type AgeGroup = "total" | "youth" | "working" | "elderly";
+
+export function usePopulationColorMap(
+  allPopulationData: AllPopulationData[],
+  ageGroup: AgeGroup = "total"
+) {
   return useMemo(() => {
     const map = new Map<number, string>();
 
     // boundaryYearの人口データを取得
     const populations = allPopulationData.map((data) => {
-      const targetData = data.totalPopulation.find(
-        (d) => d.year === data.boundaryYear
-      );
+      let targetData;
+      switch (ageGroup) {
+        case "youth":
+          targetData = data.youthPopulation.find(
+            (d) => d.year === data.boundaryYear
+          );
+          break;
+        case "working":
+          targetData = data.workingAgePopulation.find(
+            (d) => d.year === data.boundaryYear
+          );
+          break;
+        case "elderly":
+          targetData = data.elderlyPopulation.find(
+            (d) => d.year === data.boundaryYear
+          );
+          break;
+        default:
+          targetData = data.totalPopulation.find(
+            (d) => d.year === data.boundaryYear
+          );
+      }
       return { prefCode: data.prefCode, population: targetData?.value || 0 };
     });
 
@@ -35,5 +59,5 @@ export function usePopulationColorMap(allPopulationData: AllPopulationData[]) {
     });
 
     return map;
-  }, [allPopulationData]);
+  }, [allPopulationData, ageGroup]);
 }
