@@ -8,7 +8,7 @@
 
 ## Tech Stack
 
-- **Framework**: Next.js 15.4.6 (App Router)
+- **Framework**: Next.js 15 (App Router)
 - **Runtime**: React 19
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 4
