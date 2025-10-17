@@ -28,6 +28,18 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Populations / JP",
   description: "日本の都道府県別人口データの可視化",
+  openGraph: {
+    title: "Populations / JP",
+    description: "日本の都道府県別人口データの可視化",
+    type: "website",
+    locale: "ja_JP",
+    siteName: "Populations / JP",
+  },
+  twitter: {
+    card: "summary",
+    title: "Populations / JP",
+    description: "日本の都道府県別人口データの可視化",
+  },
 };
 
 export const viewport = {

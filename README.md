@@ -1,36 +1,185 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Populations / JP
+
+日本の都道府県別人口データを可視化するWebアプリケーション。
+
+株式会社ゆめみさんのフロントエンドエンジニアコーディング試験です。
+
+リンク : https://yumemi.notion.site/0e9ef27b55704d7882aab55cc86c999d
+
+## Tech Stack
+
+- **Framework**: Next.js 15.4.6 (App Router)
+- **Runtime**: React 19
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **Charts**: Recharts
+- **Deployment**: Cloudflare Workers (via OpenNext Cloudflare adapter)
+- **Package Manager**: pnpm
+- **Type Generation**: openapi-typescript
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- pnpm
+- YUMEMI API key ([ゆめみフロントエンドコーディング試験 API](https://yumemi-frontend-engineer-codecheck-api.vercel.app/api-doc))
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd yumemi-test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Set up environment variables:
 
-## Learn More
+```bash
+cp .dev.vars.example .dev.vars
+```
 
-To learn more about Next.js, take a look at the following resources:
+Edit `.dev.vars` and add your YUMEMI API key:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+YUMEMI_API_KEY=your_api_key_here
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Generate Cloudflare types:
 
-## Deploy on Vercel
+```bash
+pnpm cf-typegen
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Start the development server:
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+### Build
+
+Build for production:
+
+```bash
+pnpm build
+```
+
+Preview production build locally:
+
+```bash
+pnpm start
+```
+
+## Deployment
+
+### Cloudflare Workers
+
+1. Login to Cloudflare:
+
+```bash
+npx wrangler login
+```
+
+2. Set your API key as a secret:
+
+```bash
+npx wrangler secret put YUMEMI_API_KEY
+```
+
+3. Deploy:
+
+```bash
+pnpm run deploy
+```
+
+## Project Structure
+
+```
+src/
+├── app/                  # Next.js App Router
+│   ├── actions.ts        # Server Actions
+│   ├── layout.tsx        # Root layout with fonts and metadata
+│   └── page.tsx          # Population data page
+├── components/           # React components
+├── lib/                  # Utilities and API clients
+│   ├── api-client.ts     # openapi-fetch client
+│   └── yumemi-api.ts     # RESAS API helpers
+├── types/                # TypeScript types
+│   └── population.ts     # Population data types
+└── generated/            # Auto-generated files
+│   └── api.ts            # API types from OpenAPI spec
+```
+
+## Scripts
+
+```bash
+pnpm dev          # Start development server
+pnpm dev:clean    # Clean and start dev server
+pnpm cleanup      # Kill stuck Next.js processes
+pnpm build        # Build for production
+pnpm start        # Start production server
+pnpm lint         # Run ESLint
+pnpm deploy       # Deploy to Cloudflare Workers
+pnpm preview      # Preview deployment locally
+pnpm cf-typegen   # Generate Cloudflare env types
+pnpm api:generate # Generate API types from OpenAPI spec
+```
+
+## API Type Generation
+
+API types are automatically generated from the OpenAPI specification in `swagger/yumemi.json`:
+
+```bash
+pnpm api:generate
+```
+
+This updates `src/generated/api.ts` with type-safe API client types.
+
+## Environment Variables
+
+### Development (`.dev.vars`)
+
+```
+YUMEMI_API_KEY=your_resas_api_key
+```
+
+### Production (Cloudflare Workers)
+
+Set secrets using Wrangler:
+
+```bash
+wrangler secret put YUMEMI_API_KEY
+```
+
+## Architecture
+
+This application uses **OpenNext Cloudflare adapter** to deploy Next.js on Cloudflare Workers:
+
+- Static assets are served from Cloudflare Assets
+- API routes and server components run on Workers
+- Environment variables are accessed via `getCloudflareContext()`
+- Incremental cache uses in-memory storage (configurable for R2)
+
+See `CLAUDE.md` for detailed architecture documentation.
+
+## License
+
+MIT
+
+## Acknowledgments
+
+- Population data provided by [ゆめみフロントエンドコーディング試験 API](https://yumemi-frontend-engineer-codecheck-api.vercel.app/api-doc) from RESAS
+- Built with [Next.js](https://nextjs.org/)
+- Deployed on [Cloudflare Workers](https://workers.cloudflare.com/)
+- Japan's topojson data provided by 地球地図日本 (edited by topojson-simplify)
