@@ -6,7 +6,7 @@ import { MobileGraphPanel } from "@/components/panel/MobileGraphPanel";
 import { PrefectureSelectionPanel } from "@/components/prefecture/PrefectureSelectionPanel";
 import { usePopulationPageState } from "@/hooks/usePopulationPageState";
 import type { components } from "@/generated/api";
-import "@/components/pages/PopulationPage.css";
+import "./PopulationPage.css";
 
 type Prefecture = components["schemas"]["Prefecture"];
 

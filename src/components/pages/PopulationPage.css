@@ -1,9 +1,9 @@
-@utility bg-noise {
+.bg-noise {
   background: url(https://grainy-gradients.vercel.app/noise.svg) repeat;
   filter: grayscale(0.5);
 }
 
-@utility bg-grid {
+.bg-grid {
   background-image:
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
     linear-gradient(to top, var(--grid-line) 1px, transparent 1px);

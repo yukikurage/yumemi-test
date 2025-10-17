@@ -20,7 +20,7 @@ export function Header() {
           href="https://github.com/yukikurage/yumemi-test"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 text-base-color-700 hover:text-base-color-900 transition-colors rounded-full border border-base-color-200 h-10 w-10 xl:w-fit p-0 xl:px-4 hover:bg-base-color-50"
+          className="flex items-center justify-center gap-2 text-base-color-800 transition-colors rounded-full border border-base-color-200 h-10 w-10 xl:w-fit p-0 xl:px-4 hover:bg-base-color-50"
           aria-label="View source on GitHub"
         >
           <svg
